@@ -6,4 +6,6 @@
 <br\>
 @day 2 <br\>
 >failed to upload arcanoid project <br\>
->> project successfully added to master
+>> edit: project successfully added to master
+
+
