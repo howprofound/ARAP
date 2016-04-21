@@ -10,7 +10,7 @@
 
 <br\>
 @day ?
-> uploaded some class files< br\>
+> uploaded some class files <br\>
 >> comment Accept() in server.cpp to start project 
 
 
