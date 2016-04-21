@@ -45,7 +45,7 @@ int main(int argc, char **argv)
 	charset = SDL_LoadBMP("./images/cs8x8.bmp");
 	if (charset == NULL)
 	{
-		FreeMemoryAndQuit(charset, screen, scrtex, window, renderer, game, NULL);
+		FreeMemoryAndQuit(charset, screen, scrtex, window, renderer, game);
 		return 1;
 	}
 
@@ -58,19 +58,16 @@ int main(int argc, char **argv)
 	}
 	for (int i = 0; i < 4; i++)
 		players[i]->fish->setText(renderer);
+
+	delta = 0.016;
 	while(!game->getStatus())
 	{
 		// w tym momencie t2-t1 to czas w milisekundach, jaki uplyna³ od ostatniego narysowania ekranu, delta to ten sam czas w sekundach
-		t2 = SDL_GetTicks();
-		delta = (t2 - t1) * 0.001;
-		t1 = t2;
+		t1 = SDL_GetTicks();
+		//delta = (t2 - t1) * 0.001;
+		//t1 = t2;
 
 		SDL_FillRect(screen, NULL, colours[BLACK]);
-
-
-
-
-
 
 		/*SDL_Texture* tex = SDL_CreateTextureFromSurface(renderer, paddle.texture[0]);
 		SDL_RenderCopyEx(renderer, tex, &srcrect, &dstrect, (frames/1000)%360, NULL, SDL_FLIP_NONE);*/
@@ -86,28 +83,40 @@ int main(int argc, char **argv)
 			fpsTimer -= 0.5;
 		}
 
+		int isEvent = SDL_PollEvent(&event); // obs³uga zdarzeñ
+		if (game->isStarted() == false)
+		{
+			DrawMenu(screen, charset, &event, colours, players, isEvent, game);
+		}
+
 		sprintf(text, "%.0lf klatek/s", fps);
 		DrawString(screen, 25, SCREEN_HEIGHT - 10, text, charset);
-
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
-		for (int i = 0; i < 4; i++)
-			DrawFish(renderer, players[i]->fish->getText(), (int)players[i]->fish->getX(), (int)players[i]->fish->getY(),players[i]->fish->angle); // rysuje paletkê
+
+		
+		if (game->isStarted() == true)
+		{
+			for (int i = 0; i < 4; i++)
+				DrawFish(renderer, players[i]->fish->getText(), (int)players[i]->fish->getX(), (int)players[i]->fish->getY(), players[i]->fish->angle); // rysuje rybkê
+			MoveFish(players[0]->fish, delta, players[0]->fish->angle); // ruch rybki
+		}
+		
 		SDL_RenderPresent(renderer);
-
-		MoveFish(players[0]->fish, delta,players[0]->fish->angle); // ruch rybki
-
-		SDL_PollEvent(&event); // obs³uga zdarzeñ
+		
 		if (event.type == SDL_QUIT)
 		{
 			game->setStatus(true);
 		}
 		frames++;
-		t2 = SDL_GetTicks();
-		delta = (t2 - t1) * 0.001;
-		SDL_Delay(8.0 - delta);
+
+		do
+		{
+			t2 = SDL_GetTicks();
+			delta = (t2 - t1) * 0.001;
+		} while (delta < 0.016);
 	}
 	// zwolnienie powierzchni
-	FreeMemoryAndQuit(charset, screen, scrtex, window, renderer, game, NULL);
+	FreeMemoryAndQuit(charset, screen, scrtex, window, renderer, game);
 	return 0;
 }

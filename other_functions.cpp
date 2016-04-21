@@ -19,10 +19,9 @@ void SetColours(SDL_PixelFormat* format, Uint32* colours)
 }
 
 // zwalnia powierzchniê i zamyka okno
-void FreeMemoryAndQuit(SDL_Surface* charset, SDL_Surface* screen, SDL_Texture* scrtex, SDL_Window* window, SDL_Renderer* renderer, Game* game, Fish* fish)
+void FreeMemoryAndQuit(SDL_Surface* charset, SDL_Surface* screen, SDL_Texture* scrtex, SDL_Window* window, SDL_Renderer* renderer, Game* game)
 {
 	delete game;
-	delete fish;
 	SDL_FreeSurface(charset);
 	SDL_FreeSurface(screen);
 	SDL_DestroyTexture(scrtex);
@@ -31,7 +30,7 @@ void FreeMemoryAndQuit(SDL_Surface* charset, SDL_Surface* screen, SDL_Texture* s
 	SDL_Quit();
 }
 
-void MoveFish(Fish* fish, double &delta,int &angle)
+void MoveFish(Fish* fish, double &delta, int &angle)
 {
 	float x = fish->getX();
 	float y = fish->getY();

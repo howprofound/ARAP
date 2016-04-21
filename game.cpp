@@ -2,7 +2,8 @@
 
 Game::Game()
 {
-	quit = false;
+	this->quit = false;
+	this->started = false;
 }
 
 void Game::setStatus(bool quit)
@@ -13,4 +14,14 @@ void Game::setStatus(bool quit)
 bool Game::getStatus()
 {
 	return this->quit;
+}
+
+void Game::setIsStarted(bool started)
+{
+	this->started = started;
+}
+
+bool Game::isStarted()
+{
+	return this->started;
 }

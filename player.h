@@ -7,15 +7,22 @@
 class Player {
 public:
 	Player();
-	Player(int,int x, int );
+	Player(int, int, int);
 	int getNumber();
 	void setPoints(int);
 	int getPoints();
+	void setMenuIndex(int);
+	int getMenuIndex();
+	void setMenuPosition(int);
+	int getMenuPosition();
+
 	Fish *fish;
 	Server *server;
 private:
 	int number;
 	int points;
+	int menuIndex;
+	int menuPosition;
 
 
 

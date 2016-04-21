@@ -33,7 +33,7 @@
 
 void SetColours(SDL_PixelFormat*, Uint32*);
 
-void FreeMemoryAndQuit(SDL_Surface*, SDL_Surface*, SDL_Texture*, SDL_Window*, SDL_Renderer*, Game*, Fish*);
+void FreeMemoryAndQuit(SDL_Surface*, SDL_Surface*, SDL_Texture*, SDL_Window*, SDL_Renderer*, Game*);
 
 void MoveFish(Fish*, double &,int&);
 
@@ -49,4 +49,7 @@ void DrawSurface(SDL_Surface*, SDL_Surface*, int, int);
 void DrawLine(SDL_Surface*, int, int, int, int, Uint32);
 
 void DrawRectangle(SDL_Surface*, int, int, int, int, Uint32, Uint32);
+
 void DrawFish(SDL_Renderer*, SDL_Texture*, int, int,int);
+
+void DrawMenu(SDL_Surface*, SDL_Surface*, SDL_Event*, Uint32*, Player**, int, Game*);

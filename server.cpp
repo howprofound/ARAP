@@ -16,7 +16,7 @@ Server::Server() {
 	FD_ZERO(&master); // wyczyœæ g³ówny i pomocniczy zestaw
 	FD_ZERO(&read_fds);
 	FD_SET(ListenSocket, &master);
-	Accept();
+	//Accept();
 
 }
 
