@@ -8,4 +8,10 @@
 >failed to upload arcanoid project <br\>
 >> edit: project successfully added to master
 
+<br\>
+@day ?
+> uploaded some class files< br\>
+>> comment Accept() in server.cpp to start project 
+
+
 
