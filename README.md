@@ -17,3 +17,7 @@
 > uploaded some class files <br\>
 >> did some menus and fireworks 
 
+@day ?+2
+> project is now fully objective
+>> backup folder contains all functions before changes
+
