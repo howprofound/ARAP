@@ -21,15 +21,14 @@ Server::Server() {
 }
 
 void Server::Accept() {
-	bool x = true;
 	int fdmax = ListenSocket;
-	while (x) {
+	for (int j = 0; j < 5; j++) {
 		read_fds = master; // copy it
 		for (int i = 0; i <= fdmax; i++) {
 			if (FD_ISSET(i, &read_fds)) {
 				if (i == ListenSocket) {
 					ClientSocket = accept(ListenSocket, NULL, NULL);
-					x = false;
+					return;
 				}
 			}
 		}

@@ -39,8 +39,8 @@ float Fish::getY()
 
 
 void Fish::setText(SDL_Renderer* renderer) {
+	SDL_SetColorKey(this->texture, true, 0x000000);
 	this->text = SDL_CreateTextureFromSurface(renderer, this->texture);
-	SDL_SetTextureBlendMode(this->text, SDL_BLENDMODE_BLEND);
 }
 
 SDL_Texture *Fish::getText() {
