@@ -1,7 +1,8 @@
 #include "server.h"
 #include <stdio.h>
 
-Server::Server() {
+Server::Server()
+{
 	iResult = WSAStartup(MAKEWORD(2, 2), &wsaData);
 	ZeroMemory(&hints, sizeof(hints));
 	hints.ai_family = AF_INET;
@@ -20,13 +21,18 @@ Server::Server() {
 
 }
 
-void Server::Accept() {
+void Server::Accept()
+{
 	int fdmax = ListenSocket;
-	for (int j = 0; j < 5; j++) {
+	for (int j = 0; j < 5; j++)
+	{
 		read_fds = master; // copy it
-		for (int i = 0; i <= fdmax; i++) {
-			if (FD_ISSET(i, &read_fds)) {
-				if (i == ListenSocket) {
+		for (int i = 0; i <= fdmax; i++)
+		{
+			if (FD_ISSET(i, &read_fds))
+			{
+				if (i == ListenSocket)
+				{
 					ClientSocket = accept(ListenSocket, NULL, NULL);
 					return;
 				}

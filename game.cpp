@@ -23,12 +23,13 @@ Game::Game()
 	srand(static_cast<unsigned int>(time(NULL)));
 
 	players = new Player*[4];
-	for (int i = 0; i < 4; i++) {
+	for (int i = 0; i < 4; i++)
+	{
 		players[i] = new Player(i, i * 100, i * 150);
 	}
 
 	for (int i = 0; i < 4; i++)
-		players[i]->fish->setText(renderer);
+		players[i]->fish->setTexture(renderer);
 
 	delta = 0.016;
 	frames = 0;
@@ -88,6 +89,7 @@ void Game::MoveFish(Fish* fish)
 {
 	float x = fish->getX();
 	float y = fish->getY();
+	int angle = fish->getAngle();
 
 	const Uint8* keystate = SDL_GetKeyboardState(NULL);
 
@@ -95,30 +97,33 @@ void Game::MoveFish(Fish* fish)
 	if (keystate[SDL_SCANCODE_RIGHT] && keystate[SDL_SCANCODE_LEFT]) {}
 	else if (keystate[SDL_SCANCODE_UP] && keystate[SDL_SCANCODE_LEFT])
 	{
-		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(fish->angle*M_PI / 180)));
-		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(fish->angle*M_PI / 180)));
-		fish->angle -= int(200 * delta);
+		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(angle*M_PI / 180)));
+		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(angle*M_PI / 180)));
+		fish->setAngle(angle - int(200 * delta));
+		//fish->angle -= int(200 * delta);
 	}
 	else if (keystate[SDL_SCANCODE_UP] && keystate[SDL_SCANCODE_RIGHT])
 	{
-		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(fish->angle*M_PI / 180)));
-		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(fish->angle*M_PI / 180)));
-		fish->angle += int(200 * delta);
+		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(angle*M_PI / 180)));
+		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(angle*M_PI / 180)));
+		fish->setAngle(angle + int(200 * delta));
 	}
 
 
 	else if (keystate[SDL_SCANCODE_LEFT])
 	{
-		fish->angle -= int(200 * delta);
+		//fish->angle -= int(200 * delta);
+		fish->setAngle(angle - int(200 * delta));
 	}
 	else if (keystate[SDL_SCANCODE_RIGHT])
 	{
-		fish->angle += int(200 * delta);
+		//fish->angle += int(200 * delta);
+		fish->setAngle(angle + int(200 * delta));
 	}
 	else if (keystate[SDL_SCANCODE_UP])
 	{
-		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(fish->angle*M_PI / 180)));
-		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(fish->angle*M_PI / 180)));
+		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(angle*M_PI / 180)));
+		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(angle*M_PI / 180)));
 	}
 	x = fish->getX();
 	y = fish->getY();
@@ -213,11 +218,12 @@ void Game::DrawFish(Fish *fish)
 	srcrect.y = 0;
 	srcrect.w = 51;
 	srcrect.h = 30;
-	dstrect.x = fish->getX();
-	dstrect.y = fish->getY();
+	dstrect.x = static_cast<int>(fish->getX());
+	dstrect.y = static_cast<int>(fish->getY());
 	dstrect.w = 51;
 	dstrect.h = 30;
-	SDL_RenderCopyEx(renderer, fish->getText(), &srcrect, &dstrect, fish->angle, NULL, SDL_FLIP_NONE);
+	int angle = fish->getAngle();
+	SDL_RenderCopyEx(renderer, fish->getTexture(), &srcrect, &dstrect, angle, NULL, SDL_FLIP_NONE);
 }
 
 void Game::DrawMenu()
@@ -295,23 +301,54 @@ void Game::DrawMenu()
 				else
 				{
 					players[0]->setMenuIndex(0);
+					players[0]->setMenuPosition(0);
 				}
 			}
 		}
 	}
 	else if (menuIndex == 2)
 	{
-		DrawRectangle(SCREEN_WIDTH / 2 - 45, SCREEN_HEIGHT / 2 - 10, 90, 70, colours[GREY3], colours[GREY3]);
-		DrawRectangle(SCREEN_WIDTH / 2 - 45, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 90, 10, colours[GREY], colours[GREY]);
-		DrawString(SCREEN_WIDTH / 2 - 35, SCREEN_HEIGHT / 2, "Podaj IP:");
-		DrawString(SCREEN_WIDTH / 2 - 11, SCREEN_HEIGHT / 2 + 30, "OK");
-		DrawString(SCREEN_WIDTH / 2 - 19, SCREEN_HEIGHT / 2 + 40, "Wroc");
+		DrawRectangle(SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 10, 140, 70, colours[GREY3], colours[GREY3]);
+		DrawRectangle(SCREEN_WIDTH / 2 - 75, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 140, 10, colours[GREY], colours[GREY]);
+		DrawString(SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, "Podaj IP:");
+		DrawString(SCREEN_WIDTH / 2 - 64, SCREEN_HEIGHT / 2 + 30, players[0]->ip);
+		DrawString(SCREEN_WIDTH / 2 - 16, SCREEN_HEIGHT / 2 + 40, "OK");
+		DrawString(SCREEN_WIDTH / 2 - 24, SCREEN_HEIGHT / 2 + 50, "Wroc");
 		if (event.type == SDL_KEYDOWN && isEvent > 0)
 		{
+			if (menuPosition == 0)
+			{
+				if (event.key.keysym.sym >= SDLK_0 && event.key.keysym.sym <= SDLK_9)
+				{	
+					if (players[0]->cursorPosition < 15)
+					{
+						players[0]->ip[players[0]->cursorPosition] = event.key.keysym.sym;
+						players[0]->cursorPosition++;
+						players[0]->ip[players[0]->cursorPosition] = '\0';
+					}
+				}
+				else if (event.key.keysym.sym == SDLK_PERIOD)
+				{
+					if (players[0]->cursorPosition < 15)
+					{
+						players[0]->ip[players[0]->cursorPosition] = '.';
+						players[0]->cursorPosition++;
+						players[0]->ip[players[0]->cursorPosition] = '\0';
+					}
+				}
+				else if (event.key.keysym.sym == SDLK_BACKSPACE)
+				{
+					if (players[0]->cursorPosition > 0)
+					{
+						players[0]->cursorPosition--;
+						players[0]->ip[players[0]->cursorPosition] = '\0';
+					}
+				}
+			}
 			if (event.key.keysym.sym == SDLK_DOWN) // w dó³
 			{
 				menuPosition++;
-				menuPosition %= 2;
+				menuPosition %= 3;
 				players[0]->setMenuPosition(menuPosition);
 			}
 			else if (event.key.keysym.sym == SDLK_UP) // w górê
@@ -319,25 +356,28 @@ void Game::DrawMenu()
 				menuPosition--;
 				if (menuPosition < 0)
 				{
-					menuPosition = 1;
+					menuPosition = 2;
 				}
 				players[0]->setMenuPosition(menuPosition);
 			}
 			else if (event.key.keysym.sym == SDLK_RETURN) // enter
 			{
-				if (menuPosition == 0)
+				if (menuPosition == 1)
 				{
 					this->setIsStarted(true);
 				}
-				else
+				else if (menuPosition == 2)
 				{
 					players[0]->setMenuIndex(0);
+					players[0]->setMenuPosition(1);
 				}
 			}
 		}
 	}
 }
-void Game::Play() {
+
+void Game::Play()
+{
 	while (!this->getStatus())
 	{
 		t1 = SDL_GetTicks();

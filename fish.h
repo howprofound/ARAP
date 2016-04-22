@@ -8,20 +8,20 @@
 class Fish
 {
 private:
-	SDL_Surface* texture;
-	SDL_Texture* text;
+	SDL_Surface* surface;
+	SDL_Texture* texture;
 	float x, y;
+	int angle;
 
 public:
 	Fish();
 	Fish(const char path[],int,int);
-	SDL_Surface* getTexture();
-	SDL_Texture* getText();
-	void setText(SDL_Renderer*);
+	SDL_Texture* getTexture();
+	void setTexture(SDL_Renderer*);
 	void setX(float x);
 	float getX();
 	void setY(float y);
 	float getY();
-
-	int angle;
+	void setAngle(int);
+	int getAngle();
 };

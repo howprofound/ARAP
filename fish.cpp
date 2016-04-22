@@ -2,27 +2,24 @@
 
 Fish::Fish()
 {
-	texture = NULL;
+	surface = NULL;
 	x = SCREEN_WIDTH / 2;
 	y = SCREEN_HEIGHT - 30;
 }
-Fish::Fish(const char path[],int pozx, int pozy)
-{
-	texture = SDL_LoadBMP(path);
-	x = pozx;
-	y = pozy;
-	angle = 0;
-}
 
-SDL_Surface* Fish::getTexture()
+Fish::Fish(const char path[], int pozx, int pozy)
 {
-	return this->texture;
+	surface = SDL_LoadBMP(path);
+	x = static_cast<float>(pozx);
+	y = static_cast<float>(pozy);
+	angle = 0;
 }
 
 void Fish::setX(float x)
 {
 	this->x = x;
 }
+
 float Fish::getX()
 {
 	return this->x;
@@ -32,17 +29,29 @@ void Fish::setY(float y)
 {
 	this->y = y;
 }
+
 float Fish::getY()
 {
 	return this->y;
 }
 
-
-void Fish::setText(SDL_Renderer* renderer) {
-	SDL_SetColorKey(this->texture, true, 0x000000);
-	this->text = SDL_CreateTextureFromSurface(renderer, this->texture);
+void Fish::setTexture(SDL_Renderer* renderer)
+{
+	SDL_SetColorKey(this->surface, true, 0x000000);
+	this->texture = SDL_CreateTextureFromSurface(renderer, this->surface);
 }
 
-SDL_Texture *Fish::getText() {
-	return this->text;
+SDL_Texture *Fish::getTexture()
+{
+	return this->texture;
+}
+
+void Fish::setAngle(int angle)
+{
+	this->angle = angle;
+}
+
+int Fish::getAngle()
+{
+	return this->angle;
 }

@@ -3,7 +3,8 @@
 
 #pragma comment (lib, "Ws2_32.lib")
 
-class Server {
+class Server
+{
 private:
 	WSADATA wsaData;
 	int iResult;

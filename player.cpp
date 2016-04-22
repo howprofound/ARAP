@@ -5,17 +5,25 @@ Player::Player()
 	this->number = 0;
 	this->fish = NULL;
 	this->server = new Server();
+
 	this->menuIndex = 0;
 	this->menuPosition = 0;
+	sprintf(this->ip, "\0");
+	this->cursorPosition = 0;
 }
 
 Player::Player(int number, int x, int y)
 {
 	this->number = number;
-	this->fish = new Fish("./images/ryba1.bmp", x, y);
+	char path[128];
+	sprintf(path, "./images/ryba%d.bmp", number + 1);
+	this->fish = new Fish(path, x, y);
 	this->server = new Server();
+
 	this->menuIndex = 0;
 	this->menuPosition = 0;
+	sprintf(this->ip, "\0");
+	this->cursorPosition = 0;
 }
 
 int Player::getNumber()
@@ -27,6 +35,7 @@ void Player::setPoints(int points)
 {
 	this->points = points;
 }
+
 int Player::getPoints()
 {
 	return this->points;
