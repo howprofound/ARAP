@@ -63,7 +63,7 @@ private:
 	/*------------------------------------------------------------DRAW------------------------------------------------------------*/
 	void DrawString(int, int, const char*);
 
-	void DrawInfo(char*, Fish*);
+	void DrawInfo(char*, Player**);
 
 	void DrawSurface(SDL_Surface*, SDL_Surface*, int, int);
 

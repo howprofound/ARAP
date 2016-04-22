@@ -10,7 +10,7 @@ Game::Game()
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_SetWindowTitle(window, "ARAP v0.05");
+	SDL_SetWindowTitle(window, "ARAP v0.1");
 
 	screen = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 	scrtex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -156,12 +156,18 @@ void Game::DrawString(int x, int y, const char* text)
 }
 
 // wyœwietla informacje dotycz¹ce gry
-void Game::DrawInfo(char* text, Fish* fish)
+void Game::DrawInfo(char* text, Player** players)
 {
 	sprintf(text, "Czas:   %.1lfs", worldTime);
-	DrawString( 12, 10, text);
+	DrawString(12, 10, text);
+	sprintf(text, "Gracz 1:   %dpkt", players[0]->getPoints());
 	DrawString(12, 26, text);
-
+	sprintf(text, "Gracz 2:   %dpkt", players[1]->getPoints());
+	DrawString(162, 26, text);
+	sprintf(text, "Gracz 3:   %dpkt", players[2]->getPoints());
+	DrawString(312, 26, text);
+	sprintf(text, "Gracz 4:   %dpkt", players[3]->getPoints());
+	DrawString(462, 26, text);
 }
 
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) - punkt œrodka obrazka sprite na ekranie
@@ -308,7 +314,7 @@ void Game::DrawMenu()
 	}
 	else if (menuIndex == 2)
 	{
-		DrawRectangle(SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 10, 140, 70, colours[GREY3], colours[GREY3]);
+		DrawRectangle(SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 10, 140, 80, colours[GREY3], colours[GREY3]);
 		DrawRectangle(SCREEN_WIDTH / 2 - 75, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 140, 10, colours[GREY], colours[GREY]);
 		DrawString(SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, "Podaj IP:");
 		DrawString(SCREEN_WIDTH / 2 - 64, SCREEN_HEIGHT / 2 + 30, players[0]->ip);
@@ -382,9 +388,11 @@ void Game::Play()
 	{
 		t1 = SDL_GetTicks();
 
-		SDL_FillRect(screen, NULL, colours[BLACK]);
+		SDL_FillRect(this->screen, NULL, this->colours[BLACK]);
 
-		DrawRectangle(4, 4, SCREEN_WIDTH - 8, 50, colours[GREY3], colours[GREY2]);
+		DrawRectangle(4, 4, SCREEN_WIDTH - 8, 50, this->colours[GREY3], this->colours[GREY2]);
+		DrawInfo(this->text, this->players);
+
 		fpsTimer += delta;
 		if (fpsTimer > 0.5)
 		{
