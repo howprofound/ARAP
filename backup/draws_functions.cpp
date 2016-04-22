@@ -1,6 +1,6 @@
 #include "functions.h"
 
-// narysowanie napisu txt na powierzchni screen, zaczynaj¹c od punktu (x, y) - charset to bitmapa 128x128 zawieraj¹ca znaki
+// narysowanie napisu txt na powierzchni screen, zaczynajÂ¹c od punktu (x, y) - charset to bitmapa 128x128 zawierajÂ¹ca znaki
 void DrawString(SDL_Surface* screen, int x, int y, const char* text, SDL_Surface* charset)
 {
 	int px, py, c;
@@ -24,7 +24,7 @@ void DrawString(SDL_Surface* screen, int x, int y, const char* text, SDL_Surface
 	}
 }
 
-// wyœwietla informacje dotycz¹ce gry
+// wyÅ“wietla informacje dotyczÂ¹ce gry
 void DrawInfo(SDL_Surface* screen, SDL_Surface* charset, char* text, double &worldTime, Fish* fish, Uint32* colours)
 {
 	sprintf(text, "Czas:   %.1lfs", worldTime);
@@ -34,7 +34,7 @@ void DrawInfo(SDL_Surface* screen, SDL_Surface* charset, char* text, double &wor
 
 }
 
-// narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) - punkt œrodka obrazka sprite na ekranie
+// narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) - punkt Å“rodka obrazka sprite na ekranie
 void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y)
 {
 	SDL_Rect dest;
@@ -46,7 +46,7 @@ void DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y)
 }
 
 
-// rysowanie linii o d³ugoœci l w pionie (gdy horizontal = 0), b¹dŸ w poziomie (gdy horizontal = 1)
+// rysowanie linii o dÂ³ugoÅ“ci l w pionie (gdy horizontal = 0), bÂ¹dÅ¸ w poziomie (gdy horizontal = 1)
 void DrawLine(SDL_Surface* screen, int x, int y, int l, int horizontal, Uint32 color)
 {
 	SDL_Rect rect;
@@ -67,7 +67,7 @@ void DrawLine(SDL_Surface* screen, int x, int y, int l, int horizontal, Uint32 c
 	SDL_FillRect(screen, &rect, color);
 }
 
-// rysowanie prostok¹ta o d³ugoœci boków l i k
+// rysowanie prostokÂ¹ta o dÂ³ugoÅ“ci bokÃ³w l i k
 void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k, Uint32 outlineColor, Uint32 fillColor)
 {
 	DrawLine(screen, x, y, k, 0, outlineColor);
@@ -78,7 +78,7 @@ void DrawRectangle(SDL_Surface* screen, int x, int y, int l, int k, Uint32 outli
 	SDL_FillRect(screen, &rect, fillColor);
 }
 
-// rysuje paletkê
+// rysuje paletkÃª
 void DrawFish(SDL_Renderer* renderer, SDL_Texture* fishTexture, int x, int y,int angle)
 {
 	SDL_Rect srcrect;
@@ -108,13 +108,13 @@ void DrawMenu(SDL_Surface* screen, SDL_Surface* charset, SDL_Event* event, Uint3
 		DrawString(screen, SCREEN_WIDTH / 2 - 22, SCREEN_HEIGHT / 2 + 40, "Klient", charset);
 		if (event->type == SDL_KEYDOWN && isEvent > 0)
 		{
-			if (event->key.keysym.sym == SDLK_DOWN) // w dó³
+			if (event->key.keysym.sym == SDLK_DOWN) // w dÃ³Â³
 			{
 				menuPosition++;
 				menuPosition %= 2;
 				players[0]->setMenuPosition(menuPosition);
 			}
-			else if (event->key.keysym.sym == SDLK_UP) // w górê
+			else if (event->key.keysym.sym == SDLK_UP) // w gÃ³rÃª
 			{
 				menuPosition--;
 				if (menuPosition < 0)
@@ -146,13 +146,13 @@ void DrawMenu(SDL_Surface* screen, SDL_Surface* charset, SDL_Event* event, Uint3
 		DrawString(screen, SCREEN_WIDTH / 2 - 14, SCREEN_HEIGHT / 2 + 40, "Wroc", charset);
 		if (event->type == SDL_KEYDOWN && isEvent > 0)
 		{
-			if (event->key.keysym.sym == SDLK_DOWN) // w dó³
+			if (event->key.keysym.sym == SDLK_DOWN) // w dÃ³Â³
 			{
 				menuPosition++;
 				menuPosition %= 2;
 				players[0]->setMenuPosition(menuPosition);
 			}
-			else if (event->key.keysym.sym == SDLK_UP) // w górê
+			else if (event->key.keysym.sym == SDLK_UP) // w gÃ³rÃª
 			{
 				menuPosition--;
 				if (menuPosition < 0)
@@ -183,13 +183,13 @@ void DrawMenu(SDL_Surface* screen, SDL_Surface* charset, SDL_Event* event, Uint3
 		DrawString(screen, SCREEN_WIDTH / 2 - 19, SCREEN_HEIGHT / 2 + 40, "Wroc", charset);
 		if (event->type == SDL_KEYDOWN && isEvent > 0)
 		{
-			if (event->key.keysym.sym == SDLK_DOWN) // w dó³
+			if (event->key.keysym.sym == SDLK_DOWN) // w dÃ³Â³
 			{
 				menuPosition++;
 				menuPosition %= 2;
 				players[0]->setMenuPosition(menuPosition);
 			}
-			else if (event->key.keysym.sym == SDLK_UP) // w górê
+			else if (event->key.keysym.sym == SDLK_UP) // w gÃ³rÃª
 			{
 				menuPosition--;
 				if (menuPosition < 0)
