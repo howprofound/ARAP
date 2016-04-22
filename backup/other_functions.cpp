@@ -1,7 +1,7 @@
 #include "functions.h"
 
 
-// definiuje kolory u¿yte w grze
+// definiuje kolory uÂ¿yte w grze
 void SetColours(SDL_PixelFormat* format, Uint32* colours)
 {
 	colours[BLACK] = SDL_MapRGB(format, 0, 0, 0);
@@ -18,7 +18,7 @@ void SetColours(SDL_PixelFormat* format, Uint32* colours)
 	colours[GREY3] = SDL_MapRGB(format, 50, 50, 50);
 }
 
-// zwalnia powierzchniê i zamyka okno
+// zwalnia powierzchniÃª i zamyka okno
 void FreeMemoryAndQuit(SDL_Surface* charset, SDL_Surface* screen, SDL_Texture* scrtex, SDL_Window* window, SDL_Renderer* renderer, Game* game)
 {
 	delete game;
