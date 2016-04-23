@@ -28,3 +28,7 @@
 @day ?+4
 > added new fish textures
 >> it should works properly 
+
+@day ?+5
+> added new fishes
+>> New fishes in beautiful, fancy colors. They have eyes now! PLUM PLUM
