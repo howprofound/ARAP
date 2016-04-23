@@ -24,3 +24,7 @@
 @day ?+3
 > added menu for client, different colours the player fishes and info about player points
 >> maybe you can call the fish textures "ryba1.bmp", "ryba2.bmp" etc.
+
+@day ?+4
+> added new fish textures
+>> it should works properly 
