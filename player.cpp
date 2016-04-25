@@ -6,11 +6,6 @@ Player::Player()
 	this->fish = NULL;
 	this->server = new Server();
 	this->points = 0;
-
-	this->menuIndex = 0;
-	this->menuPosition = 0;
-	sprintf(this->ip, "\0");
-	this->cursorPosition = 0;
 }
 
 Player::Player(int number, int x, int y)
@@ -21,11 +16,6 @@ Player::Player(int number, int x, int y)
 	this->fish = new Fish(path, x, y);
 	this->server = new Server();
 	this->points = 0;
-
-	this->menuIndex = 0;
-	this->menuPosition = 0;
-	sprintf(this->ip, "\0");
-	this->cursorPosition = 0;
 }
 
 int Player::getNumber()
@@ -41,24 +31,4 @@ void Player::setPoints(int points)
 int Player::getPoints()
 {
 	return this->points;
-}
-
-void Player::setMenuIndex(int menuIndex)
-{
-	this->menuIndex = menuIndex;
-}
-
-int Player::getMenuIndex()
-{
-	return this->menuIndex;
-}
-
-void Player::setMenuPosition(int menuPosition)
-{
-	this->menuPosition = menuPosition;
-}
-
-int Player::getMenuPosition()
-{
-	return this->menuPosition;
 }

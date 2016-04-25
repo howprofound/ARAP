@@ -36,6 +36,9 @@ Game::Game()
 	worldTime = 0.0;
 	fpsTimer = 0.0;
 	fps = 0.0;
+
+	DrawMenu();
+
 	Play();
 }
 
@@ -234,151 +237,163 @@ void Game::DrawFish(Fish *fish)
 
 void Game::DrawMenu()
 {
-	int menuIndex = players[0]->getMenuIndex();
-	int menuPosition = players[0]->getMenuPosition();
-	if (menuIndex == 0)
+	int menuIndex = 0;
+	int menuPosition = 0;
+	int cursorPosition = 0;
+	char ip[16] = "\0";
+	while (true)
 	{
-		DrawRectangle(SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2 - 10, 80, 70, colours[GREY3], colours[GREY3]);
-		DrawRectangle(SCREEN_WIDTH / 2 - 40, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 80, 10, colours[GREY], colours[GREY]);
-		DrawString(SCREEN_WIDTH / 2 - 30, SCREEN_HEIGHT / 2, "Wybierz:");
-		DrawString(SCREEN_WIDTH / 2 - 22, SCREEN_HEIGHT / 2 + 30, "Serwer");
-		DrawString(SCREEN_WIDTH / 2 - 22, SCREEN_HEIGHT / 2 + 40, "Klient");
-		if (event.type == SDL_KEYDOWN && isEvent > 0)
+		SDL_FillRect(this->screen, NULL, this->colours[BLACK]);
+
+		isEvent = SDL_PollEvent(&event);
+		if (event.type == SDL_QUIT) // wciœniêcie krzy¿yka koñczy apkê
 		{
-			if (event.key.keysym.sym == SDLK_DOWN) // w dó³
+			this->setStatus(true);
+			break;
+		}
+
+		if (menuIndex == 0)
+		{
+			DrawRectangle(SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2 - 10, 80, 70, colours[GREY3], colours[GREY3]);
+			DrawRectangle(SCREEN_WIDTH / 2 - 40, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 80, 10, colours[GREY], colours[GREY]);
+			DrawString(SCREEN_WIDTH / 2 - 30, SCREEN_HEIGHT / 2, "Wybierz:");
+			DrawString(SCREEN_WIDTH / 2 - 22, SCREEN_HEIGHT / 2 + 30, "Serwer");
+			DrawString(SCREEN_WIDTH / 2 - 22, SCREEN_HEIGHT / 2 + 40, "Klient");
+			if (event.type == SDL_KEYDOWN && isEvent > 0)
 			{
-				menuPosition++;
-				menuPosition %= 2;
-				players[0]->setMenuPosition(menuPosition);
-			}
-			else if (event.key.keysym.sym == SDLK_UP) // w górê
-			{
-				menuPosition--;
-				if (menuPosition < 0)
+				if (event.key.keysym.sym == SDLK_DOWN) // w dó³
 				{
-					menuPosition = 1;
+					menuPosition++;
+					menuPosition %= 2;
 				}
-				players[0]->setMenuPosition(menuPosition);
+				else if (event.key.keysym.sym == SDLK_UP) // w górê
+				{
+					menuPosition--;
+					if (menuPosition < 0)
+					{
+						menuPosition = 1;
+					}
+				}
+				else if (event.key.keysym.sym == SDLK_RETURN) // enter
+				{
+					if (menuPosition == 0)
+					{
+						menuIndex = 1;
+					}
+					else
+					{
+						menuIndex = 2;
+						menuPosition = 0;
+					}
+				}
 			}
-			else if (event.key.keysym.sym == SDLK_RETURN) // enter
+		}
+		else if (menuIndex == 1)
+		{
+			DrawRectangle(SCREEN_WIDTH / 2 - 55, SCREEN_HEIGHT / 2 - 10, 110, 70, colours[GREY3], colours[GREY3]);
+			DrawRectangle(SCREEN_WIDTH / 2 - 55, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 110, 10, colours[GREY], colours[GREY]);
+			DrawString(SCREEN_WIDTH / 2 - 30, SCREEN_HEIGHT / 2, "IP: xxx");
+			DrawString(SCREEN_WIDTH / 2 - 46, SCREEN_HEIGHT / 2 + 30, "Zacznij gre!");
+			DrawString(SCREEN_WIDTH / 2 - 14, SCREEN_HEIGHT / 2 + 40, "Wroc");
+			if (event.type == SDL_KEYDOWN && isEvent > 0)
+			{
+				if (event.key.keysym.sym == SDLK_DOWN) // w dó³
+				{
+					menuPosition++;
+					menuPosition %= 2;
+				}
+				else if (event.key.keysym.sym == SDLK_UP) // w górê
+				{
+					menuPosition--;
+					if (menuPosition < 0)
+					{
+						menuPosition = 1;
+					}
+				}
+				else if (event.key.keysym.sym == SDLK_RETURN) // enter
+				{
+					if (menuPosition == 0)
+					{
+						break;
+					}
+					else
+					{
+						menuIndex = 0;
+						menuPosition = 0;
+					}
+				}
+			}
+		}
+		else if (menuIndex == 2)
+		{
+			DrawRectangle(SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 10, 140, 80, colours[GREY3], colours[GREY3]);
+			DrawRectangle(SCREEN_WIDTH / 2 - 75, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 140, 10, colours[GREY], colours[GREY]);
+			DrawString(SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, "Podaj IP:");
+			DrawString(SCREEN_WIDTH / 2 - 64, SCREEN_HEIGHT / 2 + 30, ip);
+			DrawString(SCREEN_WIDTH / 2 - 16, SCREEN_HEIGHT / 2 + 40, "OK");
+			DrawString(SCREEN_WIDTH / 2 - 24, SCREEN_HEIGHT / 2 + 50, "Wroc");
+			if (event.type == SDL_KEYDOWN && isEvent > 0)
 			{
 				if (menuPosition == 0)
 				{
-					players[0]->setMenuIndex(1);
-				}
-				else
-				{
-					players[0]->setMenuIndex(2);
-					players[0]->setMenuPosition(0);
-				}
-			}
-		}
-	}
-	else if (menuIndex == 1)
-	{
-		DrawRectangle(SCREEN_WIDTH / 2 - 55, SCREEN_HEIGHT / 2 - 10, 110, 70, colours[GREY3], colours[GREY3]);
-		DrawRectangle(SCREEN_WIDTH / 2 - 55, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 110, 10, colours[GREY], colours[GREY]);
-		DrawString(SCREEN_WIDTH / 2 - 30, SCREEN_HEIGHT / 2, "IP: xxx");
-		DrawString(SCREEN_WIDTH / 2 - 46, SCREEN_HEIGHT / 2 + 30, "Zacznij gre!");
-		DrawString(SCREEN_WIDTH / 2 - 14, SCREEN_HEIGHT / 2 + 40, "Wroc");
-		if (event.type == SDL_KEYDOWN && isEvent > 0)
-		{
-			if (event.key.keysym.sym == SDLK_DOWN) // w dó³
-			{
-				menuPosition++;
-				menuPosition %= 2;
-				players[0]->setMenuPosition(menuPosition);
-			}
-			else if (event.key.keysym.sym == SDLK_UP) // w górê
-			{
-				menuPosition--;
-				if (menuPosition < 0)
-				{
-					menuPosition = 1;
-				}
-				players[0]->setMenuPosition(menuPosition);
-			}
-			else if (event.key.keysym.sym == SDLK_RETURN) // enter
-			{
-				if (menuPosition == 0)
-				{
-					this->setIsStarted(true);
-				}
-				else
-				{
-					players[0]->setMenuIndex(0);
-					players[0]->setMenuPosition(0);
-				}
-			}
-		}
-	}
-	else if (menuIndex == 2)
-	{
-		DrawRectangle(SCREEN_WIDTH / 2 - 75, SCREEN_HEIGHT / 2 - 10, 140, 80, colours[GREY3], colours[GREY3]);
-		DrawRectangle(SCREEN_WIDTH / 2 - 75, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 140, 10, colours[GREY], colours[GREY]);
-		DrawString(SCREEN_WIDTH / 2 - 40, SCREEN_HEIGHT / 2, "Podaj IP:");
-		DrawString(SCREEN_WIDTH / 2 - 64, SCREEN_HEIGHT / 2 + 30, players[0]->ip);
-		DrawString(SCREEN_WIDTH / 2 - 16, SCREEN_HEIGHT / 2 + 40, "OK");
-		DrawString(SCREEN_WIDTH / 2 - 24, SCREEN_HEIGHT / 2 + 50, "Wroc");
-		if (event.type == SDL_KEYDOWN && isEvent > 0)
-		{
-			if (menuPosition == 0)
-			{
-				if (event.key.keysym.sym >= SDLK_0 && event.key.keysym.sym <= SDLK_9)
-				{	
-					if (players[0]->cursorPosition < 15)
+					if (event.key.keysym.sym >= SDLK_0 && event.key.keysym.sym <= SDLK_9)
 					{
-						players[0]->ip[players[0]->cursorPosition] = event.key.keysym.sym;
-						players[0]->cursorPosition++;
-						players[0]->ip[players[0]->cursorPosition] = '\0';
+						if (cursorPosition < 15)
+						{
+							ip[cursorPosition] = event.key.keysym.sym;
+							cursorPosition++;
+							ip[cursorPosition] = '\0';
+						}
+					}
+					else if (event.key.keysym.sym == SDLK_PERIOD)
+					{
+						if (cursorPosition < 15)
+						{
+							ip[cursorPosition] = '.';
+							cursorPosition++;
+							ip[cursorPosition] = '\0';
+						}
+					}
+					else if (event.key.keysym.sym == SDLK_BACKSPACE)
+					{
+						if (cursorPosition > 0)
+						{
+							cursorPosition--;
+							ip[cursorPosition] = '\0';
+						}
 					}
 				}
-				else if (event.key.keysym.sym == SDLK_PERIOD)
+				if (event.key.keysym.sym == SDLK_DOWN) // w dó³
 				{
-					if (players[0]->cursorPosition < 15)
+					menuPosition++;
+					menuPosition %= 3;
+				}
+				else if (event.key.keysym.sym == SDLK_UP) // w górê
+				{
+					menuPosition--;
+					if (menuPosition < 0)
 					{
-						players[0]->ip[players[0]->cursorPosition] = '.';
-						players[0]->cursorPosition++;
-						players[0]->ip[players[0]->cursorPosition] = '\0';
+						menuPosition = 2;
 					}
 				}
-				else if (event.key.keysym.sym == SDLK_BACKSPACE)
+				else if (event.key.keysym.sym == SDLK_RETURN) // enter
 				{
-					if (players[0]->cursorPosition > 0)
+					if (menuPosition == 1)
 					{
-						players[0]->cursorPosition--;
-						players[0]->ip[players[0]->cursorPosition] = '\0';
+						break;
+					}
+					else if (menuPosition == 2)
+					{
+						menuIndex = 0;
+						menuPosition = 1;
 					}
 				}
 			}
-			if (event.key.keysym.sym == SDLK_DOWN) // w dó³
-			{
-				menuPosition++;
-				menuPosition %= 3;
-				players[0]->setMenuPosition(menuPosition);
-			}
-			else if (event.key.keysym.sym == SDLK_UP) // w górê
-			{
-				menuPosition--;
-				if (menuPosition < 0)
-				{
-					menuPosition = 2;
-				}
-				players[0]->setMenuPosition(menuPosition);
-			}
-			else if (event.key.keysym.sym == SDLK_RETURN) // enter
-			{
-				if (menuPosition == 1)
-				{
-					this->setIsStarted(true);
-				}
-				else if (menuPosition == 2)
-				{
-					players[0]->setMenuIndex(0);
-					players[0]->setMenuPosition(1);
-				}
-			}
 		}
+		SDL_UpdateTexture(this->scrtex, NULL, this->screen->pixels, this->screen->pitch);
+		SDL_RenderCopy(this->renderer, this->scrtex, NULL, NULL);
+
+		SDL_RenderPresent(this->renderer);
 	}
 }
 
@@ -401,24 +416,18 @@ void Game::Play()
 			fpsTimer -= 0.5;
 		}
 
-		isEvent = SDL_PollEvent(&event);
-		if (this->isStarted() == false)
-		{
-			DrawMenu();
-		}
-
 		sprintf(text, "%.0lf klatek/s", fps);
 		DrawString(25, SCREEN_HEIGHT - 10, text);
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 
 
-		if (this->isStarted() == true)
+		for (int i = 0; i < 4; i++)
 		{
-			for (int i = 0; i < 4; i++)
-				DrawFish(players[i]->fish); // rysuje rybkê
-			MoveFish(players[0]->fish); // ruch rybki
+			DrawFish(players[i]->fish); // rysuje rybkê
 		}
+		isEvent = SDL_PollEvent(&event);
+		MoveFish(players[0]->fish); // ruch rybki
 
 		SDL_RenderPresent(renderer);
 

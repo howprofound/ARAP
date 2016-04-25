@@ -13,20 +13,12 @@ public:
 	int getNumber();
 	void setPoints(int);
 	int getPoints();
-	void setMenuIndex(int);
-	int getMenuIndex();
-	void setMenuPosition(int);
-	int getMenuPosition();
 
 	Fish *fish;
 	Server *server;
-	char ip[16];
-	int cursorPosition;
 private:
 	int number;
 	int points;
-	int menuIndex;
-	int menuPosition;
 
 
 
