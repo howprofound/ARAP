@@ -475,24 +475,25 @@ void Game::Play()
 		do
 		{
 			if (client != NULL) {
-				if(change)
+				if (change) {
 					client->Send();
+					change = false;
+				}
 				if (client->R()) {
 					players[client->package.number]->fish->setX(client->package.x);
 					players[client->package.number]->fish->setY(client->package.y);
 					players[client->package.number]->fish->setAngle(client->package.angle);
-					change = false;
 				}
 			}
 			else if (server != NULL) {
 				if (change) {
 					server->S();
+					change = false;
 				}
 				if (server->R()) {
 					players[server->package.number]->fish->setX(server->package.x);
 					players[server->package.number]->fish->setY(server->package.y);
 					players[server->package.number]->fish->setAngle(server->package.angle);
-					change = false;
 				}
 			}
 			t2 = SDL_GetTicks();

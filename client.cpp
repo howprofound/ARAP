@@ -22,12 +22,14 @@ bool Client::Connect() {
 }
 
 int Client::RecieveNumber() {
-	recv(ConnectSocket, (char*)&iResult, sizeof(int), 0);
+	recv(ConnectSocket, buffer, 1, 0);
+	sscanf(buffer, "%d", &iResult);
 	return iResult;
 }
 
 void Client::Send() {
-	send(ConnectSocket, (char*)&package, sizeof(package), 0);
+	sprintf(buffer, "%d %d %d %d", package.angle, package.number, package.x, package.y);
+	send(ConnectSocket, buffer, 15, 0);
 
 }
 bool Client::R() {
@@ -35,7 +37,8 @@ bool Client::R() {
 	FD_SET(ConnectSocket, &master);
 	select(ConnectSocket + 1, &master, NULL, NULL, &timeoutCounter);
 	if (FD_ISSET(ConnectSocket, &master)) {
-		recv(ConnectSocket, (char*)&package, sizeof(package), 0);
+		recv(ConnectSocket, buffer, 15, 0);
+		sscanf(buffer, "%d %d %d %d", &package.angle, &package.number, &package.x, &package.y);
 		return true;
 	}
 	return false;

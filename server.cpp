@@ -1,5 +1,5 @@
 #include "server.h"
-#include <stdio.h>
+
 
 Server::Server() {
 	char x[50];
@@ -21,6 +21,7 @@ Server::Server() {
 	FD_SET(ListenSocket, &master);
 	timeoutCounter.tv_sec = 0;
 	timeoutCounter.tv_usec = 0;
+	ClientSocket = INVALID_SOCKET;
 	//Accept();
 
 }
@@ -32,22 +33,27 @@ bool Server::Accept(int number) {
 	select(fdmax + 1, &read_fds, NULL, NULL, &timeoutCounter);
 	if (FD_ISSET(ListenSocket, &read_fds)) {
 		ClientSocket = accept(ListenSocket, NULL, NULL);
-		send(ClientSocket, (char*)&number, sizeof(int), 0);
+		sprintf(buffer, "%d", number);
+		send(ClientSocket, buffer, 1, 0);
 		return true;
 	}
 	return false;
 
 }
 bool Server::R() {
-	FD_ZERO(&master);
-	FD_SET(ClientSocket, &master);
-	select(ClientSocket+1, &master, NULL, NULL, &timeoutCounter);
-	if (FD_ISSET(ClientSocket, &master)) {
-		recv(ClientSocket, (char*)&package, sizeof(package), 0);
-		return true;
+	if (ClientSocket != INVALID_SOCKET) {
+		FD_ZERO(&master);
+		FD_SET(ClientSocket, &master);
+		select(ClientSocket + 1, &master, NULL, NULL, &timeoutCounter);
+		if (FD_ISSET(ClientSocket, &master)) {;
+			recv(ClientSocket, buffer, 15, 0);
+			sscanf(buffer, "%d %d %d %d", &package.angle, &package.number, &package.x, &package.y);
+			return true;
+		}
 	}
 	return false;
 }
 void Server::S() {
-	send(ClientSocket, (char*)&package, sizeof(package), 0);
+	sprintf(buffer, "%d %d %d %d", package.angle, package.number, package.x, package.y);
+	send(ClientSocket, buffer, 15, 0);
 }
