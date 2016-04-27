@@ -32,3 +32,7 @@
 @day ?+5
 > added new fishes
 >> New fishes in beautiful, fancy colors. They have eyes now! PLUM PLUM
+
+@day ?+9
+> added communication and collisions
+>> Thanks to howprofound and madzikson :***
