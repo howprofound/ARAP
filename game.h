@@ -24,8 +24,9 @@
 #include <iostream>
 #include "./sdl/include/SDL.h"
 #include "./sdl/include/SDL_main.h"
-#include "fish.h"
 #include "player.h"
+#include "server.h"
+#include "client.h"
 
 class Game
 {
@@ -44,6 +45,12 @@ private:
 	SDL_Window *window;
 	SDL_Renderer *renderer;
 	Player **players;
+	Server *server;
+	Client *client;
+	int MyNumber;
+	int NumberOfPlayers;
+	bool change;
+
 
 public:
 	Game();

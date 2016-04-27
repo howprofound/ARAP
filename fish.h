@@ -15,7 +15,7 @@ private:
 
 public:
 	Fish();
-	Fish(const char path[],int,int);
+	Fish(const char path[], int, int);
 	SDL_Texture* getTexture();
 	void setTexture(SDL_Renderer*);
 	void setX(float x);

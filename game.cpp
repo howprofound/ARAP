@@ -1,10 +1,10 @@
-#include "game.h"
+ï»¿#include "game.h"
 
 Game::Game()
 {
 	this->quit = false;
 	this->started = false;
-
+	change = false;
 	SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO);
 	SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
@@ -25,17 +25,20 @@ Game::Game()
 	players = new Player*[4];
 	for (int i = 0; i < 4; i++)
 	{
-		players[i] = new Player(i, i * 100, i * 150);
+		players[i] = new Player(i, (i+1) * 100, (i+1) * 150);
 	}
-
 	for (int i = 0; i < 4; i++)
 		players[i]->fish->setTexture(renderer);
+	server = NULL;
+	client = NULL;
 
 	delta = 0.016;
 	frames = 0;
 	worldTime = 0.0;
 	fpsTimer = 0.0;
 	fps = 0.0;
+	MyNumber = 0;
+	NumberOfPlayers = 1;
 
 	DrawMenu();
 
@@ -77,7 +80,7 @@ void Game::SetColours()
 	colours[GREY3] = SDL_MapRGB(screen->format, 50, 50, 50);
 }
 
-// zwalnia powierzchniê i zamyka okno
+// zwalnia powierzchniï¿½ i zamyka okno
 void Game::FreeMemoryAndQuit()
 {
 	SDL_FreeSurface(charset);
@@ -102,7 +105,8 @@ void Game::MoveFish(Fish* fish)
 	{
 		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(angle*M_PI / 180)));
 		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(angle*M_PI / 180)));
-		fish->setAngle(angle - int(200 * delta));
+		fish->setAngle(angle - (200 * delta));
+		change = true;
 		//fish->angle -= int(200 * delta);
 	}
 	else if (keystate[SDL_SCANCODE_UP] && keystate[SDL_SCANCODE_RIGHT])
@@ -110,6 +114,7 @@ void Game::MoveFish(Fish* fish)
 		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(angle*M_PI / 180)));
 		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(angle*M_PI / 180)));
 		fish->setAngle(angle + int(200 * delta));
+		change = true;
 	}
 
 
@@ -117,16 +122,34 @@ void Game::MoveFish(Fish* fish)
 	{
 		//fish->angle -= int(200 * delta);
 		fish->setAngle(angle - int(200 * delta));
+		change = true;
 	}
 	else if (keystate[SDL_SCANCODE_RIGHT])
 	{
 		//fish->angle += int(200 * delta);
 		fish->setAngle(angle + int(200 * delta));
+		change = true;
 	}
 	else if (keystate[SDL_SCANCODE_UP])
 	{
 		fish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(angle*M_PI / 180)));
 		fish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(angle*M_PI / 180)));
+		change = true;
+
+	}
+	if (change) {
+		if (client != NULL) {
+			client->package.angle = fish->getAngle();
+			client->package.number = MyNumber;
+			client->package.x = (int)fish->getX();
+			client->package.y = (int)fish->getY();
+		}
+		else if (server != NULL) {
+			server->package.angle = fish->getAngle();
+			server->package.number = MyNumber;
+			server->package.x = (int)fish->getX();
+			server->package.y = (int)fish->getY();
+		}
 	}
 	x = fish->getX();
 	y = fish->getY();
@@ -158,7 +181,7 @@ void Game::DrawString(int x, int y, const char* text)
 	}
 }
 
-// wyœwietla informacje dotycz¹ce gry
+// wyï¿½wietla informacje dotyczï¿½ce gry
 void Game::DrawInfo(char* text, Player** players)
 {
 	sprintf(text, "Czas:   %.1lfs", worldTime);
@@ -173,7 +196,7 @@ void Game::DrawInfo(char* text, Player** players)
 	DrawString(462, 26, text);
 }
 
-// narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) - punkt œrodka obrazka sprite na ekranie
+// narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) - punkt ï¿½rodka obrazka sprite na ekranie
 void Game::DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y)
 {
 	SDL_Rect dest;
@@ -185,7 +208,7 @@ void Game::DrawSurface(SDL_Surface* screen, SDL_Surface* sprite, int x, int y)
 }
 
 
-// rysowanie linii o d³ugoœci l w pionie (gdy horizontal = 0), b¹dŸ w poziomie (gdy horizontal = 1)
+// rysowanie linii o dï¿½ugoï¿½ci l w pionie (gdy horizontal = 0), bï¿½dï¿½ w poziomie (gdy horizontal = 1)
 void Game::DrawLine(int x, int y, int l, int horizontal, Uint32 color)
 {
 	SDL_Rect rect;
@@ -206,7 +229,7 @@ void Game::DrawLine(int x, int y, int l, int horizontal, Uint32 color)
 	SDL_FillRect(screen, &rect, color);
 }
 
-// rysowanie prostok¹ta o d³ugoœci boków l i k
+// rysowanie prostokï¿½ta o dï¿½ugoï¿½ci bokï¿½w l i k
 void Game::DrawRectangle(int x, int y, int l, int k, Uint32 outlineColor, Uint32 fillColor)
 {
 	DrawLine(x, y, k, 0, outlineColor);
@@ -217,7 +240,7 @@ void Game::DrawRectangle(int x, int y, int l, int k, Uint32 outlineColor, Uint32
 	SDL_FillRect(screen, &rect, fillColor);
 }
 
-// rysuje paletkê
+// rysuje paletkï¿½
 void Game::DrawFish(Fish *fish)
 {
 	SDL_Rect srcrect;
@@ -246,7 +269,7 @@ void Game::DrawMenu()
 		SDL_FillRect(this->screen, NULL, this->colours[BLACK]);
 
 		isEvent = SDL_PollEvent(&event);
-		if (event.type == SDL_QUIT) // wciœniêcie krzy¿yka koñczy apkê
+		if (event.type == SDL_QUIT) // wciï¿½niï¿½cie krzyï¿½yka koï¿½czy apkï¿½
 		{
 			this->setStatus(true);
 			break;
@@ -261,12 +284,12 @@ void Game::DrawMenu()
 			DrawString(SCREEN_WIDTH / 2 - 22, SCREEN_HEIGHT / 2 + 40, "Klient");
 			if (event.type == SDL_KEYDOWN && isEvent > 0)
 			{
-				if (event.key.keysym.sym == SDLK_DOWN) // w dó³
+				if (event.key.keysym.sym == SDLK_DOWN) // w dï¿½ï¿½
 				{
 					menuPosition++;
 					menuPosition %= 2;
 				}
-				else if (event.key.keysym.sym == SDLK_UP) // w górê
+				else if (event.key.keysym.sym == SDLK_UP) // w gï¿½rï¿½
 				{
 					menuPosition--;
 					if (menuPosition < 0)
@@ -290,19 +313,23 @@ void Game::DrawMenu()
 		}
 		else if (menuIndex == 1)
 		{
+			if (server == NULL)
+				server = new Server();
+			else if (server->Accept(NumberOfPlayers))
+				NumberOfPlayers++;
 			DrawRectangle(SCREEN_WIDTH / 2 - 55, SCREEN_HEIGHT / 2 - 10, 110, 70, colours[GREY3], colours[GREY3]);
 			DrawRectangle(SCREEN_WIDTH / 2 - 55, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 110, 10, colours[GREY], colours[GREY]);
-			DrawString(SCREEN_WIDTH / 2 - 30, SCREEN_HEIGHT / 2, "IP: xxx");
+			DrawString(SCREEN_WIDTH / 2 - 30, SCREEN_HEIGHT / 2, this->server->IP);
 			DrawString(SCREEN_WIDTH / 2 - 46, SCREEN_HEIGHT / 2 + 30, "Zacznij gre!");
 			DrawString(SCREEN_WIDTH / 2 - 14, SCREEN_HEIGHT / 2 + 40, "Wroc");
 			if (event.type == SDL_KEYDOWN && isEvent > 0)
 			{
-				if (event.key.keysym.sym == SDLK_DOWN) // w dó³
+				if (event.key.keysym.sym == SDLK_DOWN) // w dï¿½ï¿½
 				{
 					menuPosition++;
 					menuPosition %= 2;
 				}
-				else if (event.key.keysym.sym == SDLK_UP) // w górê
+				else if (event.key.keysym.sym == SDLK_UP) // w gï¿½rï¿½
 				{
 					menuPosition--;
 					if (menuPosition < 0)
@@ -320,6 +347,7 @@ void Game::DrawMenu()
 					{
 						menuIndex = 0;
 						menuPosition = 0;
+						server = NULL;
 					}
 				}
 			}
@@ -363,12 +391,12 @@ void Game::DrawMenu()
 						}
 					}
 				}
-				if (event.key.keysym.sym == SDLK_DOWN) // w dó³
+				if (event.key.keysym.sym == SDLK_DOWN) // w dï¿½ï¿½
 				{
 					menuPosition++;
 					menuPosition %= 3;
 				}
-				else if (event.key.keysym.sym == SDLK_UP) // w górê
+				else if (event.key.keysym.sym == SDLK_UP) // w gï¿½rï¿½
 				{
 					menuPosition--;
 					if (menuPosition < 0)
@@ -380,7 +408,13 @@ void Game::DrawMenu()
 				{
 					if (menuPosition == 1)
 					{
-						break;
+						if (client == NULL) {
+							client = new Client(ip);
+						}
+						else if(client->Connect()){
+							MyNumber = client->RecieveNumber();
+							break;
+						}
 					}
 					else if (menuPosition == 2)
 					{
@@ -424,10 +458,11 @@ void Game::Play()
 
 		for (int i = 0; i < 4; i++)
 		{
-			DrawFish(players[i]->fish); // rysuje rybkê
+			DrawFish(players[i]->fish); // rysuje rybkï¿½
 		}
 		isEvent = SDL_PollEvent(&event);
-		MoveFish(players[0]->fish); // ruch rybki
+		MoveFish(players[MyNumber]->fish);
+			// ruch rybki
 
 		SDL_RenderPresent(renderer);
 
@@ -439,6 +474,27 @@ void Game::Play()
 
 		do
 		{
+			if (client != NULL) {
+				if(change)
+					client->Send();
+				if (client->R()) {
+					players[client->package.number]->fish->setX(client->package.x);
+					players[client->package.number]->fish->setY(client->package.y);
+					players[client->package.number]->fish->setAngle(client->package.angle);
+					change = false;
+				}
+			}
+			else if (server != NULL) {
+				if (change) {
+					server->S();
+				}
+				if (server->R()) {
+					players[server->package.number]->fish->setX(server->package.x);
+					players[server->package.number]->fish->setY(server->package.y);
+					players[server->package.number]->fish->setAngle(server->package.angle);
+					change = false;
+				}
+			}
 			t2 = SDL_GetTicks();
 			delta = (t2 - t1) * 0.001;
 		} while (delta < 0.016);

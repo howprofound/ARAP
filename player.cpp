@@ -4,7 +4,6 @@ Player::Player()
 {
 	this->number = 0;
 	this->fish = NULL;
-	this->server = new Server();
 	this->points = 0;
 }
 
@@ -14,7 +13,6 @@ Player::Player(int number, int x, int y)
 	char path[128];
 	sprintf(path, "./images/ryba%d.bmp", number + 1);
 	this->fish = new Fish(path, x, y);
-	this->server = new Server();
 	this->points = 0;
 }
 

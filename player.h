@@ -3,7 +3,7 @@
 #include "./sdl/include/SDL.h"
 #include "./sdl/include/SDL_main.h"
 #include "fish.h"
-#include "server.h"
+
 
 class Player
 {
@@ -15,7 +15,6 @@ public:
 	int getPoints();
 
 	Fish *fish;
-	Server *server;
 private:
 	int number;
 	int points;
