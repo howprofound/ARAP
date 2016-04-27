@@ -66,7 +66,8 @@ private:
 
 	void FreeMemoryAndQuit();
 
-	void MoveFish(Fish*);
+	void MoveFish(Player*);
+	void Collision(Player*);
 	/*------------------------------------------------------------DRAW------------------------------------------------------------*/
 	void DrawString(int, int, const char*);
 

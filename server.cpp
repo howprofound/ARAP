@@ -41,7 +41,7 @@ bool Server::Accept(int number) {
 
 }
 bool Server::R() {
-	if (ClientSocket != INVALID_SOCKET) {
+	//if (ClientSocket != INVALID_SOCKET) {
 		FD_ZERO(&master);
 		FD_SET(ClientSocket, &master);
 		select(ClientSocket + 1, &master, NULL, NULL, &timeoutCounter);
@@ -50,7 +50,7 @@ bool Server::R() {
 			sscanf(buffer, "%d %d %d %d", &package.angle, &package.number, &package.x, &package.y);
 			return true;
 		}
-	}
+	//}
 	return false;
 }
 void Server::S() {

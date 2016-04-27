@@ -12,16 +12,22 @@ private:
 	SDL_Texture* texture;
 	float x, y;
 	int angle;
+	float back;
+	float predator;
 
 public:
 	Fish();
 	Fish(const char path[], int, int);
 	SDL_Texture* getTexture();
 	void setTexture(SDL_Renderer*);
-	void setX(float x);
+	void setX(float);
 	float getX();
-	void setY(float y);
+	void setY(float);
 	float getY();
 	void setAngle(int);
 	int getAngle();
+	void setBack(float);
+	float getBack();
+	void setPredator(float);
+	float getPredator();
 };
