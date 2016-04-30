@@ -36,3 +36,7 @@
 @day ?+9
 > added communication and collisions
 >> Thanks to howprofound and madzikson :***
+
+@day ?+11
+> added communication for 4 players, getters, setters for all variables, and some minor bugfixes.
+>> Thanks to howprofound and madzikson :***
