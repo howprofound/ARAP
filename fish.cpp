@@ -4,20 +4,20 @@ Fish::Fish()
 {
 	surface = NULL;
 	x = SCREEN_WIDTH / 2;
-	y = SCREEN_HEIGHT - 30;
+	y = SCREEN_HEIGHT / 2;
 	angle = 0;
 	back = 0;
-	predator = 0;
+	predatorAngle = 0;
 }
 
-Fish::Fish(const char path[], int pozx, int pozy)
+Fish::Fish(const char path[], int pozx, int pozy, int angle)
 {
 	surface = SDL_LoadBMP(path);
 	x = static_cast<float>(pozx);
 	y = static_cast<float>(pozy);
-	angle = 0;
+	this->angle = angle;
 	back = 0;
-	predator = 0;
+	predatorAngle = 0;
 }
 
 void Fish::setX(float x)
@@ -71,12 +71,12 @@ float Fish::getBack()
 	return this->back;
 }
 
-void Fish::setPredator(float predator)
+void Fish::setPredatorAngle(int predatorAngle)
 {
-	this->predator = predator;
+	this->predatorAngle = predatorAngle;
 }
 
-float Fish::getPredator()
+int Fish::getPredatorAngle()
 {
-	return this->predator;
+	return this->predatorAngle;
 }

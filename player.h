@@ -7,20 +7,17 @@
 
 class Player
 {
-public:
-	Player();
-	Player(int, int, int);
-	int getNumber();
-	void setPoints(int);
-	int getPoints();
-
-	Fish *fish;
 private:
 	int number;
 	int points;
+	Fish *fish;
 
-
-
-
-
+public:
+	Player();
+	Player(int, int, int, int);
+	int getNumber();
+	void setPoints(int);
+	int getPoints();
+	void setFish(Fish*);
+	Fish* getFish();
 };

@@ -1,5 +1,4 @@
 #define _USE_MATH_DEFINES
-#define _CRT_SECURE_NO_WARNINGS
 
 #define SCREEN_WIDTH	800
 #define SCREEN_HEIGHT	600
@@ -31,7 +30,6 @@
 class Game
 {
 private:
-	bool started;
 	bool quit;
 	Uint32 t1, t2;
 	int frames;
@@ -51,35 +49,22 @@ private:
 	int NumberOfPlayers;
 	bool change;
 
-
 public:
 	Game();
+
 private:
-	void setStatus(bool);
-	bool getStatus();
-	void setIsStarted(bool);
-	bool isStarted();
-
-
 	void Play();
 	void SetColours();
-
 	void FreeMemoryAndQuit();
-
 	void MoveFish(Player*);
 	void Collision(Player*);
+
 	/*------------------------------------------------------------DRAW------------------------------------------------------------*/
 	void DrawString(int, int, const char*);
-
 	void DrawInfo(char*, Player**);
-
 	void DrawSurface(SDL_Surface*, SDL_Surface*, int, int);
-
 	void DrawLine( int, int, int, int, Uint32);
-
 	void DrawRectangle(int, int, int, int, Uint32, Uint32);
-
 	void DrawFish(Fish *fish);
-
 	void DrawMenu();
 };

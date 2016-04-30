@@ -1,8 +1,9 @@
 #pragma once
-struct Package {
+
+struct Package
+{
 	int x;
 	int y;
 	int angle;
 	int number;
-
 };

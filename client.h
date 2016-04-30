@@ -7,19 +7,29 @@
 
 #pragma comment (lib, "Ws2_32.lib")
 
-class Client {
-public:
+class Client
+{
+private:
+	bool connected;
 	WSADATA wsaData;
 	Package package;
-	SOCKET ConnectSocket = INVALID_SOCKET;
-	addrinfo *result = NULL, hints;
+	SOCKET ConnectSocket;
+	addrinfo *result;
+	addrinfo hints;
 	int iResult;
+	fd_set master;
+	timeval timeoutCounter;
+	char buffer[32];
+
+public:
 	Client(char*);
-	int RecieveNumber();
+	int ReceiveNumber();
 	bool Connect();
 	void Send();
 	bool R();
-	fd_set master;
-	timeval timeoutCounter;
-	char buffer[512];
+	bool ReceivePlayers();
+	bool isConnected();
+	void setConnected(bool);
+	Package* getPackage();
+	int getIResult();
 };
