@@ -12,7 +12,6 @@ private:
 	SDL_Texture* texture;
 	float x, y;
 	int angle;
-	float back;
 	int predatorAngle;
 
 public:
@@ -26,8 +25,6 @@ public:
 	float getY();
 	void setAngle(int);
 	int getAngle();
-	void setBack(float);
-	float getBack();
 	void setPredatorAngle(int);
 	int getPredatorAngle();
 };

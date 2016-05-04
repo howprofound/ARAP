@@ -17,7 +17,7 @@ Server::Server()
 	bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);
 	freeaddrinfo(result);
 	listen(ListenSocket, SOMAXCONN);
-	FD_ZERO(&master); // wyczyœæ g³ówny i pomocniczy zestaw
+	FD_ZERO(&master); // wyczysc glowny i pomocniczy zestaw
 	FD_ZERO(&read_fds);
 	FD_SET(ListenSocket, &master);
 	timeoutCounter.tv_sec = 0;
@@ -51,7 +51,7 @@ bool Server::R(int number)
 	select(ClientSocket[number-1] + 1, &master, NULL, NULL, &timeoutCounter);
 	if (FD_ISSET(ClientSocket[number-1], &master))
 	{
-		recv(ClientSocket[number-1], buffer, 15, 0);
+		recv(ClientSocket[number-1], buffer, sizeof(buffer), 0);
 		sscanf_s(buffer, "%d %d %d %d", &package.angle, &package.number, &package.x, &package.y);
 		return true;
 	}
@@ -60,8 +60,9 @@ bool Server::R(int number)
 
 void Server::S(int number) 
 {
-	sprintf_s(buffer, "%d %d %d %d", package.angle, package.number, package.x, package.y);
-	send(ClientSocket[number-1], buffer, 15, 0);
+	sprintf_s(buffer, "%d %d %d %d %d %d %d %d %d %d", package.angle, package.number, package.x, package.y,
+		package.points[0], package.points[1], package.points[2], package.points[3], package.back, package.predatorAngle);
+	send(ClientSocket[number-1], buffer, sizeof(buffer), 0);
 }
 
 void Server::SendPlayers(int number)

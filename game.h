@@ -4,6 +4,7 @@
 #define SCREEN_HEIGHT	600
 
 #define FISH_VELOCITY 400.0
+#define BACK_VELOCITY 200.0
 
 #define BLACK 0
 #define RED 1
@@ -57,7 +58,7 @@ private:
 	void SetColours();
 	void FreeMemoryAndQuit();
 	void MoveFish(Player*);
-	void Collision(Player*);
+	void Collision();
 
 	/*------------------------------------------------------------DRAW------------------------------------------------------------*/
 	void DrawString(int, int, const char*);

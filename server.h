@@ -24,7 +24,7 @@ private:
 	SOCKET ListenSocket;
 	SOCKET ClientSocket[3];
 	
-	char buffer[32];
+	char buffer[64];
 	char IP[32];
 	Package package;
 

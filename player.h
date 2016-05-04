@@ -11,6 +11,7 @@ private:
 	int number;
 	int points;
 	Fish *fish;
+	int back;
 
 public:
 	Player();
@@ -20,4 +21,6 @@ public:
 	int getPoints();
 	void setFish(Fish*);
 	Fish* getFish();
+	void setBack(int);
+	int getBack();
 };

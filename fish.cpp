@@ -6,7 +6,6 @@ Fish::Fish()
 	x = SCREEN_WIDTH / 2;
 	y = SCREEN_HEIGHT / 2;
 	angle = 0;
-	back = 0;
 	predatorAngle = 0;
 }
 
@@ -16,7 +15,6 @@ Fish::Fish(const char path[], int pozx, int pozy, int angle)
 	x = static_cast<float>(pozx);
 	y = static_cast<float>(pozy);
 	this->angle = angle;
-	back = 0;
 	predatorAngle = 0;
 }
 
@@ -59,16 +57,6 @@ void Fish::setAngle(int angle)
 int Fish::getAngle()
 {
 	return this->angle;
-}
-
-void Fish::setBack(float back)
-{
-	this->back = back;
-}
-
-float Fish::getBack()
-{
-	return this->back;
 }
 
 void Fish::setPredatorAngle(int predatorAngle)

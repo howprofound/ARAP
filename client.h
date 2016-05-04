@@ -19,7 +19,7 @@ private:
 	int iResult;
 	fd_set master;
 	timeval timeoutCounter;
-	char buffer[32];
+	char buffer[64];
 
 public:
 	Client(char*);
