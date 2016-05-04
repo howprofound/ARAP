@@ -40,3 +40,7 @@
 @day ?+11
 > added communication for 4 players, getters, setters for all variables, and some minor bugfixes.
 >> It looks great now! Mr. Deadlock will be proud!
+
+@day ?+15
+> added collisions for 4 players
+>> Server's fish sometimes lag during collision, dunno why
