@@ -44,7 +44,7 @@ bool Server::Accept(int number)
 	return false;
 
 }
-bool Server::R(int number)
+bool Server::Receive(int number)
 {
 	FD_ZERO(&master);
 	FD_SET(ClientSocket[number-1], &master);
@@ -58,7 +58,7 @@ bool Server::R(int number)
 	return false;
 }
 
-void Server::S(int number) 
+void Server::Send(int number) 
 {
 	sprintf_s(buffer, "%d %d %d %d %d %d %d %d %d %d", package.angle, package.number, package.x, package.y,
 		package.points[0], package.points[1], package.points[2], package.points[3], package.back, package.predatorAngle);

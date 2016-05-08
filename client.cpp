@@ -42,7 +42,7 @@ void Client::Send()
 	send(ConnectSocket, buffer, sizeof(buffer), 0);
 }
 
-bool Client::R()
+bool Client::Receive()
 {
 	FD_ZERO(&master);
 	FD_SET(ConnectSocket, &master);

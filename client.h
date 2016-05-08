@@ -26,7 +26,7 @@ public:
 	int ReceiveNumber();
 	bool Connect();
 	void Send();
-	bool R();
+	bool Receive();
 	bool ReceivePlayers();
 	bool isConnected();
 	void setConnected(bool);

@@ -31,8 +31,8 @@ private:
 public:
 	Server();
 	bool Accept(int);
-	bool R(int);
-	void S(int);
+	bool Receive(int);
+	void Send(int);
 	void SendPlayers(int);
 	Package* getPackage();
 	char* getIP();

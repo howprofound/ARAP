@@ -10,7 +10,7 @@ Game::Game()
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
 	SDL_RenderSetLogicalSize(renderer, SCREEN_WIDTH, SCREEN_HEIGHT);
 	SDL_SetRenderDrawColor(renderer, 0, 0, 0, 255);
-	SDL_SetWindowTitle(window, "ARAP v0.3");
+	SDL_SetWindowTitle(window, "ARAP v0.9");
 
 	screen = SDL_CreateRGBSurface(0, SCREEN_WIDTH, SCREEN_HEIGHT, 32, 0x00FF0000, 0x0000FF00, 0x000000FF, 0xFF000000);
 	scrtex = SDL_CreateTexture(renderer, SDL_PIXELFORMAT_ARGB8888, SDL_TEXTUREACCESS_STREAMING, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -38,7 +38,7 @@ Game::Game()
 	fpsTimer = 0.0;
 	fps = 0.0;
 	MyNumber = 0;
-	NumberOfPlayers = 1;
+	numberOfPlayers = 1;
 
 	DrawMenu();
 
@@ -156,30 +156,43 @@ void Game::MoveFish(Player* player)
 
 void Game::Collision()
 {
-	for (int i = 0; i < NumberOfPlayers; i++) // i - atakujacy, j - ofiara
+	for (int i = 0; i < numberOfPlayers; i++) // i - atakujacy, j - ofiara
 	{
-		Fish* playerFish = players[i]->getFish();
-		float x = playerFish->getX() + 25.5f;
-		float y = playerFish->getY() - 15.0f;
-		int angle = playerFish->getAngle();
-		y -= static_cast<float>(sin(angle*M_PI / 180) * 15.0f);
-		x -= static_cast<float>(cos(angle*M_PI / 180) * 15.0f);
-		for (int j = 0; j < NumberOfPlayers; j++)
+		Fish* predatorFish = players[i]->getFish();
+		float predatorPosX = predatorFish->getX() + 25.5f;
+		float predatorPosY = predatorFish->getY() + 15.0f;
+		int predatorAngle = predatorFish->getAngle();
+		predatorPosX -= static_cast<float>(cos(predatorAngle*M_PI / 180) * 25.5f);
+		predatorPosY -= static_cast<float>(sin(predatorAngle*M_PI / 180) * 25.5f);
+		//DrawRectangle(predatorPosX - 5, predatorPosY - 5, 10, 10, this->colours[GREEN], this->colours[GREEN]);
+		for (int j = 0; j < numberOfPlayers; j++)
 		{
 			if (i == j)
-				continue;
-			else if (players[j]->getBack() <= 0)
 			{
-				Fish* playersFish = players[j]->getFish();
-				float xTemp = playersFish->getX() + 25.5f;
-				float yTemp = playersFish->getY() - 15.0f;
-				if ((x <= (xTemp + 15) && y <= (yTemp + 15)) && (x >= (xTemp - 15) && y >= (yTemp - 15)) &&
-					(x >= (xTemp - 15) && y <= (yTemp + 15)) && (x <= (xTemp + 15) && y >= (yTemp - 15)))
+				continue;
+			}
+			if (players[j]->getBack() <= 0)
+			{
+				Fish* victimFish = players[j]->getFish();
+				int victimAngle = victimFish->getAngle();
+
+				float victimPosX = victimFish->getX() + 25.5f;
+				float victimPosY = victimFish->getY() + 15.0f;
+
+				float upperLeftCornerX = victimPosX - 15.0f;;
+				float upperLeftCornerY = victimPosY - 15.0f;
+				//DrawRectangle(upperLeftCornerX - 5, upperLeftCornerY - 5, 10, 10, this->colours[BLUE], this->colours[BLUE]);
+
+				float bottomRightCornerX = victimPosX + 15.0f;
+				float bottomRightCornerY = victimPosY + 15.0f;
+				//DrawRectangle(bottomRightCornerX - 5, bottomRightCornerY - 5, 10, 10, this->colours[WHITE], this->colours[WHITE]);
+
+				if (predatorPosX >= upperLeftCornerX && predatorPosY >= upperLeftCornerY &&
+					predatorPosX <= bottomRightCornerX && predatorPosY <= bottomRightCornerY)
 				{
 					players[i]->setPoints(players[i]->getPoints() + 10);
-
 					players[j]->setBack(250);
-					playersFish->setPredatorAngle(playerFish->getAngle());
+					victimFish->setPredatorAngle(predatorAngle);
 					Package* package = server->getPackage();
 					package->points[i] = players[i]->getPoints();
 					change = true;
@@ -217,14 +230,12 @@ void Game::DrawInfo(char* text, Player** players)
 {
 	sprintf_s(text, 128, "Czas:   %.1lfs", worldTime);
 	DrawString(12, 10, text);
-	sprintf_s(text, 128, "Gracz Y:   %dpkt", players[0]->getPoints());
-	DrawString(12, 26, text);
-	sprintf_s(text, 128, "Gracz R:   %dpkt", players[1]->getPoints());
-	DrawString(162, 26, text);
-	sprintf_s(text, 128, "Gracz B:   %dpkt", players[2]->getPoints());
-	DrawString(312, 26, text);
-	sprintf_s(text, 128, "Gracz G:   %dpkt", players[3]->getPoints());
-	DrawString(462, 26, text);
+	char name[5] = "YRBG";
+	for (int i = 0; i < numberOfPlayers; i++)
+	{
+		sprintf_s(text, 128, "Gracz %c: %dpkt", name[i], players[i]->getPoints());
+		DrawString(12+i*150, 26, text);
+	}
 }
 
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) - punkt srodka obrazka sprite na ekranie
@@ -347,9 +358,9 @@ void Game::DrawMenu()
 			{
 				server = new Server();
 			}
-			else if (server->Accept(NumberOfPlayers))
+			else if (server->Accept(numberOfPlayers))
 			{
-				NumberOfPlayers++;
+				numberOfPlayers++;
 			}
 			DrawRectangle(SCREEN_WIDTH / 2 - 65, SCREEN_HEIGHT / 2 - 10, 130, 70, colours[GREY3], colours[GREY3]);
 			DrawRectangle(SCREEN_WIDTH / 2 - 65, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 130, 10, colours[GREY], colours[GREY]);
@@ -375,7 +386,7 @@ void Game::DrawMenu()
 				{
 					if (menuPosition == 0)
 					{
-						server->SendPlayers(NumberOfPlayers);
+						server->SendPlayers(numberOfPlayers);
 						break;
 					}
 					else
@@ -393,7 +404,7 @@ void Game::DrawMenu()
 			DrawRectangle(SCREEN_WIDTH / 2 - 75, (SCREEN_HEIGHT / 2 + 29) + menuPosition * 10, 140, 10, colours[GREY], colours[GREY]);
 			if (client != NULL && client->isConnected() && client->ReceivePlayers())
 			{
-				NumberOfPlayers = client->getIResult();
+				numberOfPlayers = client->getIResult();
 				break;
 			}
 			else if (client != NULL && client->isConnected())
@@ -506,7 +517,7 @@ void Game::Play()
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 
-		for (int i = 0; i < NumberOfPlayers; i++)
+		for (int i = 0; i < numberOfPlayers; i++)
 		{
 			DrawFish(players[i]->getFish()); // rysuje rybki
 		}
@@ -516,7 +527,7 @@ void Game::Play()
 		if (server != NULL) // kolizje
 		{
 			Collision();
-			for (int i = 0; i < NumberOfPlayers; i++)
+			for (int i = 0; i < numberOfPlayers; i++)
 			{
 				int backTime = players[i]->getBack();
 				if (backTime > 0)
@@ -525,7 +536,6 @@ void Game::Play()
 				}
 			}
 		}
-		
 
 		SDL_RenderPresent(renderer);
 
@@ -544,7 +554,7 @@ void Game::Play()
 					client->Send();
 					change = false;
 				}
-				if (client->R()) 
+				if (client->Receive()) 
 				{
 					if (client->getIResult() == 0) return;
 					Package* package = client->getPackage();
@@ -563,34 +573,30 @@ void Game::Play()
 			{
 				if (change) 
 				{
-					for (int i = 1; i < NumberOfPlayers; i++)
+					for (int i = 1; i < numberOfPlayers; i++)
 					{
 						Package* package = server->getPackage();
 						package->back = players[i]->getBack();
 						package->predatorAngle = players[i]->getFish()->getPredatorAngle();
-						server->S(i);
+						server->Send(i);
 					}
 					change = false;
 				}
-				for (int i = 1; i < NumberOfPlayers; i++)
+				for (int i = 1; i < numberOfPlayers; i++)
 				{
-					if (server->R(i))
+					if (server->Receive(i))
 					{
 						Package* package = server->getPackage();
 						players[package->number]->getFish()->setX(static_cast<float>(package->x));
 						players[package->number]->getFish()->setY(static_cast<float>(package->y));
 						players[package->number]->getFish()->setAngle(package->angle);
-						package->points[0] = players[0]->getPoints();
-						package->points[1] = players[1]->getPoints();
-						package->points[2] = players[2]->getPoints();
-						package->points[3] = players[3]->getPoints();
-						for (int j = 1; j < NumberOfPlayers; j++)
+						for (int j = 1; j < numberOfPlayers; j++)
 						{
 							if (j != package->number)
 							{
 								package->back = players[j]->getBack();
 								package->predatorAngle = players[j]->getFish()->getPredatorAngle();
-								server->S(j);
+								server->Send(j);
 							}
 						}
 					}

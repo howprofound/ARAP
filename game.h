@@ -47,7 +47,7 @@ private:
 	Server *server;
 	Client *client;
 	int MyNumber;
-	int NumberOfPlayers;
+	int numberOfPlayers;
 	bool change;
 
 public:
