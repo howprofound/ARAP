@@ -44,3 +44,7 @@
 @day ?+15
 > added collisions for 4 players
 >> Server's fish sometimes lag during collision, dunno why
+
+@day ?+19
+> fixed collisions
+>> They almost work as intended
