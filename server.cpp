@@ -58,11 +58,16 @@ bool Server::Receive(int number)
 	return false;
 }
 
-void Server::Send(int number) 
+void Server::SendPosition(int number) 
 {
-	sprintf_s(buffer, "%d %d %d %d %d %d %d %d %d %d", package.angle, package.number, package.x, package.y,
-		package.points[0], package.points[1], package.points[2], package.points[3], package.back, package.predatorAngle);
+	sprintf_s(buffer, "p%d %d %d %d", package.angle, package.number, package.x, package.y);
 	send(ClientSocket[number-1], buffer, sizeof(buffer), 0);
+}
+
+void Server::SendCollision(int number)
+{
+	sprintf_s(buffer, "c%d %d %d %d %d %d", package.points[0], package.points[1], package.points[2], package.points[3], package.back, package.predatorAngle);
+	send(ClientSocket[number - 1], buffer, sizeof(buffer), 0);
 }
 
 void Server::SendPlayers(int number)

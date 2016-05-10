@@ -4,7 +4,6 @@ Game::Game()
 {
 	this->quit = false;
 	change = false;
-	//isCollision = false;
 	SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO);
 	SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
@@ -28,6 +27,7 @@ Game::Game()
 	{
 		players[i] = new Player(i, pos[i][0], pos[i][1], pos[i][2]);
 		players[i]->getFish()->setTexture(renderer);
+		collisions[i] = false;
 	}
 	server = NULL;
 	client = NULL;
@@ -125,6 +125,11 @@ void Game::MoveFish(Player* player)
 		playerFish->setY(y - static_cast<float>(BACK_VELOCITY * delta * sin(predator*M_PI / 180)));
 		playerFish->setX(x - static_cast<float>(BACK_VELOCITY * delta * cos(predator*M_PI / 180)));
 		player->setBack(back - static_cast<int>(1000*delta));
+		if (client != NULL)
+		{
+			Package* package = client->getPackage();
+			package->back = back - static_cast<int>(1000 * delta);
+		}
 		change = true;
 	}
 	x = playerFish->getX();
@@ -164,7 +169,6 @@ void Game::Collision()
 		int predatorAngle = predatorFish->getAngle();
 		predatorPosX -= static_cast<float>(cos(predatorAngle*M_PI / 180) * 25.5f);
 		predatorPosY -= static_cast<float>(sin(predatorAngle*M_PI / 180) * 25.5f);
-		//DrawRectangle(predatorPosX - 5, predatorPosY - 5, 10, 10, this->colours[GREEN], this->colours[GREEN]);
 		for (int j = 0; j < numberOfPlayers; j++)
 		{
 			if (i == j)
@@ -181,11 +185,9 @@ void Game::Collision()
 
 				float upperLeftCornerX = victimPosX - 15.0f;;
 				float upperLeftCornerY = victimPosY - 15.0f;
-				//DrawRectangle(upperLeftCornerX - 5, upperLeftCornerY - 5, 10, 10, this->colours[BLUE], this->colours[BLUE]);
 
 				float bottomRightCornerX = victimPosX + 15.0f;
 				float bottomRightCornerY = victimPosY + 15.0f;
-				//DrawRectangle(bottomRightCornerX - 5, bottomRightCornerY - 5, 10, 10, this->colours[WHITE], this->colours[WHITE]);
 
 				if (predatorPosX >= upperLeftCornerX && predatorPosY >= upperLeftCornerY &&
 					predatorPosX <= bottomRightCornerX && predatorPosY <= bottomRightCornerY)
@@ -195,7 +197,7 @@ void Game::Collision()
 					victimFish->setPredatorAngle(predatorAngle);
 					Package* package = server->getPackage();
 					package->points[i] = players[i]->getPoints();
-					change = true;
+					collisions[j] = true;
 				}
 			}
 		}
@@ -310,7 +312,7 @@ void Game::DrawMenu()
 		SDL_FillRect(this->screen, NULL, this->colours[BLACK]);
 
 		isEvent = SDL_PollEvent(&event);
-		if (event.type == SDL_QUIT) // wcisniecie krzyzyka konczy apke
+		if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && isEvent > 0 && event.key.keysym.sym == SDLK_ESCAPE)) // wcisniecie krzyzyka/ESC konczy apke
 		{
 			this->quit = true;
 			break;
@@ -505,6 +507,7 @@ void Game::Play()
 		DrawInfo(this->text, this->players);
 
 		fpsTimer += delta;
+		worldTime += delta;
 		if (fpsTimer > 0.5)
 		{
 			fps = frames * 2;
@@ -513,6 +516,8 @@ void Game::Play()
 		}
 
 		sprintf_s(text, 128, "%.0lf klatek/s", fps);
+
+		//sprintf_s(text, 128, "%d %d %d %d", players[0]->getBack(), players[1]->getBack(), players[2]->getBack(), players[3]->getBack());
 		DrawString(25, SCREEN_HEIGHT - 10, text);
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
@@ -539,7 +544,7 @@ void Game::Play()
 
 		SDL_RenderPresent(renderer);
 
-		if (event.type == SDL_QUIT)
+		if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && isEvent > 0 && event.key.keysym.sym == SDLK_ESCAPE)) // wcisniecie krzyzyka/ESC konczy apke
 		{
 			this->quit = true;
 		}
@@ -571,16 +576,24 @@ void Game::Play()
 			}
 			else if (server != NULL) 
 			{
-				if (change) 
+				if (change)
 				{
 					for (int i = 1; i < numberOfPlayers; i++)
+					{
+						server->SendPosition(i);
+					}
+					change = false;
+				}
+				for (int i = 1; i < numberOfPlayers; i++)
+				{
+					if (collisions[i] == true)
 					{
 						Package* package = server->getPackage();
 						package->back = players[i]->getBack();
 						package->predatorAngle = players[i]->getFish()->getPredatorAngle();
-						server->Send(i);
+						server->SendCollision(i);
+						collisions[i] = false;
 					}
-					change = false;
 				}
 				for (int i = 1; i < numberOfPlayers; i++)
 				{
@@ -594,9 +607,7 @@ void Game::Play()
 						{
 							if (j != package->number)
 							{
-								package->back = players[j]->getBack();
-								package->predatorAngle = players[j]->getFish()->getPredatorAngle();
-								server->Send(j);
+								server->SendPosition(j);
 							}
 						}
 					}

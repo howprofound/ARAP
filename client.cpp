@@ -50,8 +50,14 @@ bool Client::Receive()
 	if (FD_ISSET(ConnectSocket, &master))
 	{
 		recv(ConnectSocket, buffer, sizeof(buffer), 0);
-		sscanf_s(buffer, "%d %d %d %d %d %d %d %d %d %d", &package.angle, &package.number, &package.x, &package.y,
-			&package.points[0], &package.points[1], &package.points[2], &package.points[3], &package.back, &package.predatorAngle);
+		if (buffer[0] == 'p') // pozycja
+		{
+			sscanf_s(buffer + 1, "%d %d %d %d", &package.angle, &package.number, &package.x, &package.y);
+		}
+		else if (buffer[0] == 'c') // kolizja
+		{
+			sscanf_s(buffer + 1, "%d %d %d %d %d %d", &package.points[0], &package.points[1], &package.points[2], &package.points[3], &package.back, &package.predatorAngle);
+		}
 		return true;
 	}
 	return false;

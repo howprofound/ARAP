@@ -32,7 +32,8 @@ public:
 	Server();
 	bool Accept(int);
 	bool Receive(int);
-	void Send(int);
+	void SendPosition(int);
+	void SendCollision(int);
 	void SendPlayers(int);
 	Package* getPackage();
 	char* getIP();

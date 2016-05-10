@@ -49,6 +49,7 @@ private:
 	int MyNumber;
 	int numberOfPlayers;
 	bool change;
+	bool collisions[4];
 
 public:
 	Game();
