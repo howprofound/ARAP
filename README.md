@@ -48,3 +48,7 @@
 @day ?+19
 > fixed collisions
 >> They almost work as intended
+
+@day ?+21
+> separated methods, which send info about collisions and positions of fishes
+>> v0.99999999 ???
