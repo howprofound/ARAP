@@ -52,3 +52,7 @@
 @day ?+21
 > separated methods, which send info about collisions and positions of fishes
 >> v0.99999999 ???
+
+@day ?+22
+> player's score is sending properly now
+>> v1.0 I guess
