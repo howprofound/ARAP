@@ -56,7 +56,11 @@ bool Client::Receive()
 		}
 		else if (buffer[0] == 'c') // kolizja
 		{
-			sscanf_s(buffer + 1, "%d %d %d %d %d %d", &package.points[0], &package.points[1], &package.points[2], &package.points[3], &package.back, &package.predatorAngle);
+			sscanf_s(buffer + 1, "%d %d", &package.back, &package.predatorAngle);
+		}
+		else if (buffer[0] == 's') // kolizja
+		{
+			sscanf_s(buffer + 1, "%d %d %d %d", &package.points[0], &package.points[1], &package.points[2], &package.points[3]);
 		}
 		return true;
 	}

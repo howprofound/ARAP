@@ -66,7 +66,13 @@ void Server::SendPosition(int number)
 
 void Server::SendCollision(int number)
 {
-	sprintf_s(buffer, "c%d %d %d %d %d %d", package.points[0], package.points[1], package.points[2], package.points[3], package.back, package.predatorAngle);
+	sprintf_s(buffer, "c%d %d", package.back, package.predatorAngle);
+	send(ClientSocket[number - 1], buffer, sizeof(buffer), 0);
+}
+
+void Server::SendScore(int number)
+{
+	sprintf_s(buffer, "s%d %d %d %d", package.points[0], package.points[1], package.points[2], package.points[3]);
 	send(ClientSocket[number - 1], buffer, sizeof(buffer), 0);
 }
 

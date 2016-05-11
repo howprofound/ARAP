@@ -34,6 +34,7 @@ public:
 	bool Receive(int);
 	void SendPosition(int);
 	void SendCollision(int);
+	void SendScore(int);
 	void SendPlayers(int);
 	Package* getPackage();
 	char* getIP();

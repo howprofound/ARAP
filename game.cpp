@@ -516,8 +516,6 @@ void Game::Play()
 		}
 
 		sprintf_s(text, 128, "%.0lf klatek/s", fps);
-
-		//sprintf_s(text, 128, "%d %d %d %d", players[0]->getBack(), players[1]->getBack(), players[2]->getBack(), players[3]->getBack());
 		DrawString(25, SCREEN_HEIGHT - 10, text);
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
@@ -574,7 +572,7 @@ void Game::Play()
 					players[MyNumber]->getFish()->setPredatorAngle(package->predatorAngle);
 				}
 			}
-			else if (server != NULL) 
+			else if (server != NULL)
 			{
 				if (change)
 				{
@@ -584,7 +582,7 @@ void Game::Play()
 					}
 					change = false;
 				}
-				for (int i = 1; i < numberOfPlayers; i++)
+				for (int i = 0; i < numberOfPlayers; i++)
 				{
 					if (collisions[i] == true)
 					{
@@ -592,6 +590,10 @@ void Game::Play()
 						package->back = players[i]->getBack();
 						package->predatorAngle = players[i]->getFish()->getPredatorAngle();
 						server->SendCollision(i);
+						for (int j = 1; j < numberOfPlayers; j++)
+						{
+							server->SendScore(j);
+						}
 						collisions[i] = false;
 					}
 				}
