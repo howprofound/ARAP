@@ -26,6 +26,11 @@ Server::Server()
 	{
 		ClientSocket[i] = INVALID_SOCKET;
 	}
+	package.back = 0;
+	package.points[0] = 0;
+	package.points[1] = 0;
+	package.points[2] = 0;
+	package.points[3] = 0;
 	//Accept();
 }
 
