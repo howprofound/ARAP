@@ -530,7 +530,7 @@ void Game::Play()
 		if (server != NULL) // kolizje
 		{
 			Collision();
-			for (int i = 0; i < numberOfPlayers; i++)
+			for (int i = 1; i < numberOfPlayers; i++)
 			{
 				int backTime = players[i]->getBack();
 				if (backTime > 0)
@@ -586,10 +586,13 @@ void Game::Play()
 				{
 					if (collisions[i] == true)
 					{
-						Package* package = server->getPackage();
-						package->back = players[i]->getBack();
-						package->predatorAngle = players[i]->getFish()->getPredatorAngle();
-						server->SendCollision(i);
+						if (i != 0)
+						{
+							Package* package = server->getPackage();
+							package->back = players[i]->getBack();
+							package->predatorAngle = players[i]->getFish()->getPredatorAngle();
+							server->SendCollision(i);
+						}
 						for (int j = 1; j < numberOfPlayers; j++)
 						{
 							server->SendScore(j);
