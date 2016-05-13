@@ -527,19 +527,6 @@ void Game::Play()
 		isEvent = SDL_PollEvent(&event);
 		MoveFish(players[MyNumber]); // ruch rybki
 
-		if (server != NULL) // kolizje
-		{
-			Collision();
-			for (int i = 1; i < numberOfPlayers; i++)
-			{
-				int backTime = players[i]->getBack();
-				if (backTime > 0)
-				{
-					players[i]->setBack(backTime - static_cast<int>(1000 * delta));
-				}
-			}
-		}
-
 		SDL_RenderPresent(renderer);
 
 		if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && isEvent > 0 && event.key.keysym.sym == SDLK_ESCAPE)) // wcisniecie krzyzyka/ESC konczy apke
@@ -548,16 +535,16 @@ void Game::Play()
 		}
 		frames++;
 
-		do
+		if (client != NULL)
 		{
-			if (client != NULL)
+			if (change)
 			{
-				if (change) 
-				{
-					client->Send();
-					change = false;
-				}
-				if (client->Receive()) 
+				client->Send();
+				change = false;
+			}
+			do
+			{
+				if (client->Receive())
 				{
 					if (client->getIResult() == 0) return;
 					Package* package = client->getPackage();
@@ -571,35 +558,49 @@ void Game::Play()
 					players[MyNumber]->setBack(package->back);
 					players[MyNumber]->getFish()->setPredatorAngle(package->predatorAngle);
 				}
-			}
-			else if (server != NULL)
+				t2 = SDL_GetTicks();
+				delta = (t2 - t1) * 0.001;
+			} while (delta < 0.016);
+		}
+		else if (server != NULL)
+		{
+			Collision();
+			for (int i = 1; i < numberOfPlayers; i++)
 			{
-				if (change)
+				int backTime = players[i]->getBack();
+				if (backTime > 0)
 				{
-					for (int i = 1; i < numberOfPlayers; i++)
-					{
-						server->SendPosition(i);
-					}
-					change = false;
+					players[i]->setBack(backTime - static_cast<int>(1000 * delta));
 				}
-				for (int i = 0; i < numberOfPlayers; i++)
+			}
+			if (change)
+			{
+				for (int i = 1; i < numberOfPlayers; i++)
 				{
-					if (collisions[i] == true)
-					{
-						if (i != 0)
-						{
-							Package* package = server->getPackage();
-							package->back = players[i]->getBack();
-							package->predatorAngle = players[i]->getFish()->getPredatorAngle();
-							server->SendCollision(i);
-						}
-						for (int j = 1; j < numberOfPlayers; j++)
-						{
-							server->SendScore(j);
-						}
-						collisions[i] = false;
-					}
+					server->SendPosition(i);
 				}
+				change = false;
+			}
+			for (int i = 0; i < numberOfPlayers; i++)
+			{
+				if (collisions[i] == true)
+				{
+					if (i != 0)
+					{
+						Package* package = server->getPackage();
+						package->back = players[i]->getBack();
+						package->predatorAngle = players[i]->getFish()->getPredatorAngle();
+						server->SendCollision(i);
+					}
+					for (int j = 1; j < numberOfPlayers; j++)
+					{
+						server->SendScore(j);
+					}
+					collisions[i] = false;
+				}
+			}
+			do
+			{
 				for (int i = 1; i < numberOfPlayers; i++)
 				{
 					if (server->Receive(i))
@@ -617,10 +618,10 @@ void Game::Play()
 						}
 					}
 				}
-			}
-			t2 = SDL_GetTicks();
-			delta = (t2 - t1) * 0.001;
-		} while (delta < 0.016);
+				t2 = SDL_GetTicks();
+				delta = (t2 - t1) * 0.001;
+			} while (delta < 0.016);
+		}
 	}
 	FreeMemoryAndQuit();
 }

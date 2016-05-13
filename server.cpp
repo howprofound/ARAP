@@ -11,7 +11,7 @@ Server::Server()
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
 	gethostname(x, 50);
-	getaddrinfo(x, "9999", &hints, &result);
+	getaddrinfo(x, "10010", &hints, &result);
 	inet_ntop(hints.ai_family, &((sockaddr_in *)result->ai_addr)->sin_addr, (PSTR)IP, sizeof(IP));
 	ListenSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	bind(ListenSocket, result->ai_addr, (int)result->ai_addrlen);

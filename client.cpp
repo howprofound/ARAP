@@ -10,7 +10,7 @@ Client::Client(char *IP)
 	hints.ai_socktype = SOCK_STREAM;
 	hints.ai_protocol = IPPROTO_TCP;
 	hints.ai_flags = AI_PASSIVE;
-	getaddrinfo(IP, "9999", &hints, &result);
+	getaddrinfo(IP, "10010", &hints, &result);
 	ConnectSocket = socket(result->ai_family, result->ai_socktype, result->ai_protocol);
 	timeoutCounter.tv_sec = 0;
 	timeoutCounter.tv_usec = 0;
@@ -63,7 +63,7 @@ bool Client::Receive()
 		{
 			sscanf_s(buffer + 1, "%d %d", &package.back, &package.predatorAngle);
 		}
-		else if (buffer[0] == 's') // kolizja
+		else if (buffer[0] == 's') // punkty
 		{
 			sscanf_s(buffer + 1, "%d %d %d %d", &package.points[0], &package.points[1], &package.points[2], &package.points[3]);
 		}
