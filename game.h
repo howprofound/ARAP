@@ -31,10 +31,9 @@
 class Game
 {
 private:
-	bool quit;
+	bool quit, collisions[4];
 	Uint32 t1, t2;
-	int frames;
-	int isEvent;
+	int frames, isEvent, winner, MyNumber, numberOfPlayers;
 	double delta, worldTime, fpsTimer, fps;
 	Uint32 colours[12];
 	char text[128];
@@ -46,10 +45,6 @@ private:
 	Player **players;
 	Server *server;
 	Client *client;
-	int MyNumber;
-	int numberOfPlayers;
-	bool change;
-	bool collisions[4];
 
 public:
 	Game();
@@ -60,10 +55,14 @@ private:
 	void FreeMemoryAndQuit();
 	void MoveFish(Player*);
 	void Collision();
+	void ClientLoop();
+	void ServerLoop();
+	int IsAnyPlayerWinner();
 
 	/*------------------------------------------------------------DRAW------------------------------------------------------------*/
 	void DrawString(int, int, const char*);
-	void DrawInfo(char*, Player**);
+	void DrawInfo();
+	void DrawInfoAboutWinner();
 	void DrawSurface(SDL_Surface*, SDL_Surface*, int, int);
 	void DrawLine( int, int, int, int, Uint32);
 	void DrawRectangle(int, int, int, int, Uint32, Uint32);

@@ -3,7 +3,7 @@
 Game::Game()
 {
 	this->quit = false;
-	change = false;
+	this->winner = -1;
 	SDL_Init(SDL_INIT_TIMER | SDL_INIT_VIDEO);
 	SDL_CreateWindowAndRenderer(SCREEN_WIDTH, SCREEN_HEIGHT, 0, &window, &renderer);
 	SDL_SetHint(SDL_HINT_RENDER_SCALE_QUALITY, "linear");
@@ -92,31 +92,26 @@ void Game::MoveFish(Player* player)
 			playerFish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(angle*M_PI / 180)));
 			playerFish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(angle*M_PI / 180)));
 			playerFish->setAngle(angle - int(200 * delta));
-			change = true;
 		}
 		else if (keystate[SDL_SCANCODE_UP] && keystate[SDL_SCANCODE_RIGHT])
 		{
 			playerFish->setY(y - static_cast<float>(FISH_VELOCITY*delta * sin(angle*M_PI / 180)));
 			playerFish->setX(x - static_cast<float>(FISH_VELOCITY*delta * cos(angle*M_PI / 180)));
 			playerFish->setAngle(angle + int(200 * delta));
-			change = true;
 		}
 
 		else if (keystate[SDL_SCANCODE_LEFT])
 		{
 			playerFish->setAngle(angle - int(200 * delta));
-			change = true;
 		}
 		else if (keystate[SDL_SCANCODE_RIGHT])
 		{
 			playerFish->setAngle(angle + int(200 * delta));
-			change = true;
 		}
 		else if (keystate[SDL_SCANCODE_UP])
 		{
 			playerFish->setY(y - static_cast<float>(FISH_VELOCITY * delta * sin(angle*M_PI / 180)));
 			playerFish->setX(x - static_cast<float>(FISH_VELOCITY * delta * cos(angle*M_PI / 180)));
-			change = true;
 		}
 	}
 	else
@@ -130,37 +125,53 @@ void Game::MoveFish(Player* player)
 			Package* package = client->getPackage();
 			package->back = back - static_cast<int>(1000 * delta);
 		}
-		change = true;
 	}
 	x = playerFish->getX();
 	y = playerFish->getY();
-	if (x <= 7) playerFish->setX(8);
-	else if (x >= SCREEN_WIDTH - 56) playerFish->setX(SCREEN_WIDTH - 57);
-	if (y <= 64) playerFish->setY(65);
-	else if (y >= SCREEN_HEIGHT - 51) playerFish->setY(SCREEN_HEIGHT - 52);
-	if (change)
+	if (x <= 7)
 	{
-		Package* package = NULL;
-		if (client != NULL)
-		{
-			package = client->getPackage();
-		}
-		else if (server != NULL)
-		{
-			package = server->getPackage();
-		}
-		if (package != NULL)
-		{
-			package->angle = playerFish->getAngle();
-			package->number = MyNumber;
-			package->x = (int)x;
-			package->y = (int)y;
-		}
+		playerFish->setX(8);
+		x = 8;
+	}
+	else if (x >= SCREEN_WIDTH - 56)
+	{
+		playerFish->setX(SCREEN_WIDTH - 57);
+		x = SCREEN_WIDTH - 57;
+	}
+	if (y <= 64)
+	{
+		playerFish->setY(65);
+		y = 65;
+	}
+	else if (y >= SCREEN_HEIGHT - 51)
+	{
+		playerFish->setY(SCREEN_HEIGHT - 52);
+		y = SCREEN_HEIGHT - 52;
+	}
+	Package* package = NULL;
+	if (client != NULL)
+	{
+		package = client->getPackage();
+	}
+	else if (server != NULL)
+	{
+		package = server->getPackage();
+	}
+	if (package != NULL)
+	{
+		package->angle = playerFish->getAngle();
+		package->number = MyNumber;
+		package->x = (int)x;
+		package->y = (int)y;
 	}
 }
 
 void Game::Collision()
 {
+	if (winner >= 0)
+	{
+		return;
+	}
 	for (int i = 0; i < numberOfPlayers; i++) // i - atakujacy, j - ofiara
 	{
 		Fish* predatorFish = players[i]->getFish();
@@ -228,8 +239,9 @@ void Game::DrawString(int x, int y, const char* text)
 }
 
 // wyswietla informacje dotyczace gry
-void Game::DrawInfo(char* text, Player** players)
+void Game::DrawInfo()
 {
+	DrawRectangle(4, 4, SCREEN_WIDTH - 8, 50, this->colours[GREY3], this->colours[GREY2]);
 	sprintf_s(text, 128, "Czas:   %.1lfs", worldTime);
 	DrawString(12, 10, text);
 	char name[5] = "YRBG";
@@ -238,6 +250,8 @@ void Game::DrawInfo(char* text, Player** players)
 		sprintf_s(text, 128, "Gracz %c: %dpkt", name[i], players[i]->getPoints());
 		DrawString(12+i*150, 26, text);
 	}
+	sprintf_s(text, 128, "%.0lf klatek/s", fps);
+	DrawString(25, SCREEN_HEIGHT - 10, text);
 }
 
 // narysowanie na ekranie screen powierzchni sprite w punkcie (x, y) - punkt srodka obrazka sprite na ekranie
@@ -472,17 +486,21 @@ void Game::DrawMenu()
 						if (client == NULL)
 						{
 							client = new Client(ip);
-						}
-						else if(!client->isConnected() && client->Connect())
-						{
-							MyNumber = client->ReceiveNumber();
-							client->setConnected(true);
+							if (!client->isConnected() && client->Connect())
+							{
+								MyNumber = client->ReceiveNumber();
+								client->setConnected(true);
+							}
 						}
 					}
 					else if (menuPosition == 2)
 					{
 						menuIndex = 0;
 						menuPosition = 1;
+						if (client != NULL)
+						{
+							delete client;
+						}
 						client = NULL;
 					}
 				}
@@ -495,17 +513,137 @@ void Game::DrawMenu()
 	}
 }
 
+void Game::ClientLoop()
+{
+	client->Send();
+	do
+	{
+		if (client->Receive())
+		{
+			if (client->getIResult() == 0) return;
+			Package* package = client->getPackage();
+			players[package->number]->getFish()->setX(static_cast<float>(package->x));
+			players[package->number]->getFish()->setY(static_cast<float>(package->y));
+			players[package->number]->getFish()->setAngle(package->angle);
+			players[0]->setPoints(package->points[0]);
+			players[1]->setPoints(package->points[1]);
+			players[2]->setPoints(package->points[2]);
+			players[3]->setPoints(package->points[3]);
+			players[MyNumber]->setBack(package->back);
+			players[MyNumber]->getFish()->setPredatorAngle(package->predatorAngle);
+		}
+		t2 = SDL_GetTicks();
+		delta = (t2 - t1) * 0.001;
+	} while (delta < 0.016);
+}
+
+void Game::ServerLoop()
+{
+	Collision();
+	for (int i = 1; i < numberOfPlayers; i++)
+	{
+		int backTime = players[i]->getBack();
+		if (backTime > 0)
+		{
+			players[i]->setBack(backTime - static_cast<int>(1000 * delta));
+		}
+	}
+	for (int i = 1; i < numberOfPlayers; i++)
+	{
+		server->SendPosition(i);
+	}
+	for (int i = 0; i < numberOfPlayers; i++)
+	{
+		if (collisions[i] == true)
+		{
+			if (i != 0)
+			{
+				Package* package = server->getPackage();
+				package->back = players[i]->getBack();
+				package->predatorAngle = players[i]->getFish()->getPredatorAngle();
+				server->SendCollision(i);
+			}
+			for (int j = 1; j < numberOfPlayers; j++)
+			{
+				server->SendScore(j);
+			}
+			collisions[i] = false;
+		}
+	}
+	do
+	{
+		for (int i = 1; i < numberOfPlayers; i++)
+		{
+			if (server->Receive(i))
+			{
+				Package* package = server->getPackage();
+				players[package->number]->getFish()->setX(static_cast<float>(package->x));
+				players[package->number]->getFish()->setY(static_cast<float>(package->y));
+				players[package->number]->getFish()->setAngle(package->angle);
+				for (int j = 1; j < numberOfPlayers; j++)
+				{
+					if (j != package->number)
+					{
+						server->SendPosition(j);
+					}
+				}
+			}
+		}
+		t2 = SDL_GetTicks();
+		delta = (t2 - t1) * 0.001;
+	} while (delta < 0.016);
+}
+
+int Game::IsAnyPlayerWinner()
+{
+	for (int i = 0; i < numberOfPlayers; i++)
+	{
+		if (players[i]->getPoints() >= 200)
+		{
+			return i;
+		}
+	}
+	return -1;
+}
+
+void Game::DrawInfoAboutWinner()
+{
+	DrawRectangle(SCREEN_WIDTH/2 - 64, SCREEN_HEIGHT/2, 128, 16, this->colours[GREY3], this->colours[GREY2]);
+	switch (this->winner)
+	{
+		case 0 :
+		{
+			sprintf_s(text, 128, "Gracz Y wygral!");
+			break;
+		}
+		case 1:
+		{
+			sprintf_s(text, 128, "Gracz R wygral!");
+			break;
+		}
+		case 2:
+		{
+			sprintf_s(text, 128, "Gracz B wygral!");
+			break;
+		}
+		case 3:
+		{
+			sprintf_s(text, 128, "Gracz G wygral!");
+			break;
+		}
+		default:
+		{
+			sprintf_s(text, 128, "Koniec gry!");
+		}
+	}
+	DrawString(SCREEN_WIDTH/2 - 60, SCREEN_HEIGHT/2 + 4, text);
+}
+
 void Game::Play()
 {
 	while (!this->quit)
 	{
 		t1 = SDL_GetTicks();
-
-		SDL_FillRect(this->screen, NULL, this->colours[BLACK]);
-
-		DrawRectangle(4, 4, SCREEN_WIDTH - 8, 50, this->colours[GREY3], this->colours[GREY2]);
-		DrawInfo(this->text, this->players);
-
 		fpsTimer += delta;
 		worldTime += delta;
 		if (fpsTimer > 0.5)
@@ -515,113 +653,41 @@ void Game::Play()
 			fpsTimer -= 0.5;
 		}
 
-		sprintf_s(text, 128, "%.0lf klatek/s", fps);
-		DrawString(25, SCREEN_HEIGHT - 10, text);
+		SDL_FillRect(this->screen, NULL, this->colours[BLACK]); // czyszczenie ekranu
+		
+		DrawInfo(); // rysowanie punktow i czasu
+		winner = IsAnyPlayerWinner();
+		if (winner >= 0)
+		{
+			DrawInfoAboutWinner();
+		}
+		
 		SDL_UpdateTexture(scrtex, NULL, screen->pixels, screen->pitch);
 		SDL_RenderCopy(renderer, scrtex, NULL, NULL);
 
 		for (int i = 0; i < numberOfPlayers; i++)
 		{
-			DrawFish(players[i]->getFish()); // rysuje rybki
+			DrawFish(players[i]->getFish()); // rysowanie rybek
 		}
 		isEvent = SDL_PollEvent(&event);
 		MoveFish(players[MyNumber]); // ruch rybki
 
 		SDL_RenderPresent(renderer);
 
+		if (client != NULL)
+		{
+			ClientLoop();
+		}
+		else if (server != NULL)
+		{
+			ServerLoop();
+		}
+
 		if (event.type == SDL_QUIT || (event.type == SDL_KEYDOWN && isEvent > 0 && event.key.keysym.sym == SDLK_ESCAPE)) // wcisniecie krzyzyka/ESC konczy apke
 		{
 			this->quit = true;
 		}
 		frames++;
-
-		if (client != NULL)
-		{
-			if (change)
-			{
-				client->Send();
-				change = false;
-			}
-			do
-			{
-				if (client->Receive())
-				{
-					if (client->getIResult() == 0) return;
-					Package* package = client->getPackage();
-					players[package->number]->getFish()->setX(static_cast<float>(package->x));
-					players[package->number]->getFish()->setY(static_cast<float>(package->y));
-					players[package->number]->getFish()->setAngle(package->angle);
-					players[0]->setPoints(package->points[0]);
-					players[1]->setPoints(package->points[1]);
-					players[2]->setPoints(package->points[2]);
-					players[3]->setPoints(package->points[3]);
-					players[MyNumber]->setBack(package->back);
-					players[MyNumber]->getFish()->setPredatorAngle(package->predatorAngle);
-				}
-				t2 = SDL_GetTicks();
-				delta = (t2 - t1) * 0.001;
-			} while (delta < 0.016);
-		}
-		else if (server != NULL)
-		{
-			Collision();
-			for (int i = 1; i < numberOfPlayers; i++)
-			{
-				int backTime = players[i]->getBack();
-				if (backTime > 0)
-				{
-					players[i]->setBack(backTime - static_cast<int>(1000 * delta));
-				}
-			}
-			if (change)
-			{
-				for (int i = 1; i < numberOfPlayers; i++)
-				{
-					server->SendPosition(i);
-				}
-				change = false;
-			}
-			for (int i = 0; i < numberOfPlayers; i++)
-			{
-				if (collisions[i] == true)
-				{
-					if (i != 0)
-					{
-						Package* package = server->getPackage();
-						package->back = players[i]->getBack();
-						package->predatorAngle = players[i]->getFish()->getPredatorAngle();
-						server->SendCollision(i);
-					}
-					for (int j = 1; j < numberOfPlayers; j++)
-					{
-						server->SendScore(j);
-					}
-					collisions[i] = false;
-				}
-			}
-			do
-			{
-				for (int i = 1; i < numberOfPlayers; i++)
-				{
-					if (server->Receive(i))
-					{
-						Package* package = server->getPackage();
-						players[package->number]->getFish()->setX(static_cast<float>(package->x));
-						players[package->number]->getFish()->setY(static_cast<float>(package->y));
-						players[package->number]->getFish()->setAngle(package->angle);
-						for (int j = 1; j < numberOfPlayers; j++)
-						{
-							if (j != package->number)
-							{
-								server->SendPosition(j);
-							}
-						}
-					}
-				}
-				t2 = SDL_GetTicks();
-				delta = (t2 - t1) * 0.001;
-			} while (delta < 0.016);
-		}
 	}
 	FreeMemoryAndQuit();
 }
