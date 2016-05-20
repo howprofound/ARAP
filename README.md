@@ -56,3 +56,7 @@
 @day ?+22
 > player's score is sending properly now
 >> v1.0 I guess
+
+@day ?+29
+> add victory conditions
+>> that's all
